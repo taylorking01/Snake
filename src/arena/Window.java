@@ -43,9 +43,12 @@ public class Window extends Application {
                              "-fx-border-color: #5a5a5a; " +
                              "-fx-border-width: 2px;" +
                              "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 1, 1);";  // Add shadow effect
-        String buttonHoverStyle = "-fx-background-color: #5a5a5a; " +
-                                  "-fx-border-color: #7a7a7a; " +
-                                  "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0, 1, 1);";  // Darker shadow on hover
+        
+        // Subtle hover effect: only change the background shade slightly
+        String buttonHoverStyle = "-fx-background-color: #4a4a4a; " +  // Slightly lighter grey
+                                  "-fx-border-color: #6a6a6a;" +       // Subtle change to border color
+                                  "-fx-border-radius: 10px; " +        // Keep rounded corners
+                                  "-fx-background-radius: 10px;";      // Keep background rounded
 
         // Create top pane
         HBox topPane = new HBox();
@@ -124,3 +127,4 @@ public class Window extends Application {
         launch(args);  // Launch the JavaFX application
     }
 }
+
