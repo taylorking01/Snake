@@ -33,31 +33,37 @@ public class Window extends Application {
         String mediumGrey = "#2f2f2f";  // Slightly lighter grey for the tiles
         String whiteText = "-fx-text-fill: white;";  // White text for buttons
 
-        // Button Style: Subtle hover effects and stylish look
+        // Button Style: Rounded buttons with a simple hover effect (no size change)
         String buttonStyle = "-fx-background-color: #3a3a3a; " +
                              "-fx-text-fill: white; " +
                              "-fx-font-size: 14px; " +
                              "-fx-padding: 8px 15px; " +
-                             "-fx-border-radius: 5px; " +
-                             "-fx-background-radius: 5px; " +
+                             "-fx-border-radius: 10px; " +  // Rounded corners
+                             "-fx-background-radius: 10px; " +
                              "-fx-border-color: #5a5a5a; " +
-                             "-fx-border-width: 2px;" +
-                             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 1, 1);";  // Add shadow effect
-        
-        // Subtle hover effect: only change the background shade slightly
+                             "-fx-border-width: 2px;";
+
+        // Subtle hover effect: only change the background shade slightly, no padding or size change
         String buttonHoverStyle = "-fx-background-color: #4a4a4a; " +  // Slightly lighter grey
                                   "-fx-border-color: #6a6a6a;" +       // Subtle change to border color
                                   "-fx-border-radius: 10px; " +        // Keep rounded corners
                                   "-fx-background-radius: 10px;";      // Keep background rounded
+        
+     // Click effect: Darken the button to simulate a "pressed" state
+        String buttonClickStyle = "-fx-background-color: #2a2a2a; " +  // Darker grey
+                                  "-fx-border-color: #7a7a7a;" +       // Slightly lighter border
+                                  "-fx-border-radius: 10px; " +
+                                  "-fx-background-radius: 10px;";
 
         // Create top pane
         HBox topPane = new HBox();
         topPane.setPadding(new Insets(10));
         topPane.setAlignment(Pos.CENTER);  // Center-align the buttons
         Button startButton = new Button("Start Game");
-        startButton.setStyle(buttonStyle);
-        startButton.setOnMouseEntered(e -> startButton.setStyle(buttonHoverStyle)); // Hover effect
+        startButton.setOnMouseEntered(e -> startButton.setStyle(buttonHoverStyle));
         startButton.setOnMouseExited(e -> startButton.setStyle(buttonStyle));
+        startButton.setOnMousePressed(e -> startButton.setStyle(buttonClickStyle));
+        startButton.setOnMouseReleased(e -> startButton.setStyle(buttonHoverStyle));  // Return to hover effect when released
         topPane.getChildren().add(startButton);
         topPane.setPrefHeight(80);  // Give the top pane a higher priority height
         topPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
@@ -67,9 +73,10 @@ public class Window extends Application {
         bottomPane.setPadding(new Insets(10));
         bottomPane.setAlignment(Pos.CENTER);  // Center-align the buttons
         Button pauseButton = new Button("Pause Game");
-        pauseButton.setStyle(buttonStyle);
         pauseButton.setOnMouseEntered(e -> pauseButton.setStyle(buttonHoverStyle));
         pauseButton.setOnMouseExited(e -> pauseButton.setStyle(buttonStyle));
+        pauseButton.setOnMousePressed(e -> pauseButton.setStyle(buttonClickStyle));
+        pauseButton.setOnMouseReleased(e -> pauseButton.setStyle(buttonHoverStyle));
         bottomPane.getChildren().add(pauseButton);
         bottomPane.setPrefHeight(80);  // Give the bottom pane a higher priority height
         bottomPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
@@ -79,9 +86,10 @@ public class Window extends Application {
         leftPane.setPadding(new Insets(10));
         leftPane.setAlignment(Pos.CENTER);  // Center-align the buttons
         Button settingsButton = new Button("Settings");
-        settingsButton.setStyle(buttonStyle);
         settingsButton.setOnMouseEntered(e -> settingsButton.setStyle(buttonHoverStyle));
         settingsButton.setOnMouseExited(e -> settingsButton.setStyle(buttonStyle));
+        settingsButton.setOnMousePressed(e -> settingsButton.setStyle(buttonClickStyle));
+        settingsButton.setOnMouseReleased(e -> settingsButton.setStyle(buttonHoverStyle));
         leftPane.getChildren().add(settingsButton);
         leftPane.setPrefWidth(120);  // Give the left pane a higher priority width
         leftPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
@@ -91,9 +99,10 @@ public class Window extends Application {
         rightPane.setPadding(new Insets(10));
         rightPane.setAlignment(Pos.CENTER);  // Center-align the buttons
         Button statsButton = new Button("Stats");
-        statsButton.setStyle(buttonStyle);
         statsButton.setOnMouseEntered(e -> statsButton.setStyle(buttonHoverStyle));
         statsButton.setOnMouseExited(e -> statsButton.setStyle(buttonStyle));
+        statsButton.setOnMousePressed(e -> statsButton.setStyle(buttonClickStyle));
+        statsButton.setOnMouseReleased(e -> statsButton.setStyle(buttonHoverStyle));
         rightPane.getChildren().add(statsButton);
         rightPane.setPrefWidth(120);  // Give the right pane a higher priority width
         rightPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
