@@ -18,8 +18,8 @@ public class SnakeLinkedList {
 	
 	//Method to move the snake by adding a new head and removing the tail
 	public void move() {
-		int newX = head.x;
-		int newY = head.y;
+		int newX = head.getX();
+		int newY = head.getY();
 		
 		//Calculate new head position based on current direction
 		switch(currentDirection) {
@@ -39,7 +39,7 @@ public class SnakeLinkedList {
 		
 		
 		SnakeNode newHead = new SnakeNode(newX, newY);
-		newHead.next = head;
+		newHead.setNext(head);
 		head = newHead;
 		
 		removeTail(); //Remove the tail, unless we want to grow the snake
@@ -60,10 +60,10 @@ public class SnakeLinkedList {
 	//Remove the tail of the snake to simulate movement
 	private void removeTail() {
 		SnakeNode current = head;
-		while (current.next != tail) {
-			current = current.next;
+		while (current.getNext() != tail) {
+			current = current.getNext();
 		}
-		current.next = null;
+		current.setNext(null);
 		tail = current;
 	}
 	

@@ -47,21 +47,20 @@ public class Arena {
         updateSnakeDisplay();
     }
 
-    // Update grid with the current snake state
     private void updateSnakeDisplay() {
         clearGrid(); // First, clear the grid to reset it
         SnakeNode current = snake.getHead();
 
         // Traverse through the snake linked list and update the grid
         while (current != null) {
-            String position = current.y + "," + current.x; // Key format is "row,col"
+            String position = current.getY() + "," + current.getX(); // Key format is "row,col"
             Rectangle tile = tileMap.get(position);
 
             if (tile != null) {
                 tile.setFill(Color.LIMEGREEN); // Snake body color
             }
 
-            current = current.next; // Move to the next part of the snake
+            current = current.getNext(); // Move to the next part of the snake
         }
     }
 
@@ -89,19 +88,19 @@ public class Arena {
         SnakeNode head = snake.getHead();
 
         // Wall collision detection
-        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
+        if (head.getX() < 0 || head.getX() >= cols || head.getY() < 0 || head.getY() >= rows) {
             // Handle game over or restart logic here
             System.out.println("Game Over! Snake hit the wall.");
         }
 
         // Self-collision detection
-        SnakeNode current = head.next;
+        SnakeNode current = head.getNext();
         while (current != null) {
-            if (head.x == current.x && head.y == current.y) {
+            if (head.getX() == current.getX() && head.getY() == current.getY()) {
                 System.out.println("Game Over! Snake hit itself.");
                 break;
             }
-            current = current.next;
+            current = current.getNext();
         }
     }
 
