@@ -44,29 +44,29 @@ public class GameController {
         if (isRunning) {
             timeline.stop();
             isRunning = false;
-            printGameOutput(output);
-            commandLog.printCommandLog();
+            printGameOutput(output);  // Print game outcome
+            commandLog.printExecutedCommands();  // Print the executed command log
         }
     }
 
     public void handleKeyPress(KeyEvent event) {
-        if (keyProcessed) return;  // Ignore if key is already processed
+        if (keyProcessed) return;  // Ignore if key is already processed in this frame
 
         switch (event.getCode()) {
             case UP:
-                commandLog.addCommand(Direction.Dir.UP, arena.getHeadPosition());
-                keyProcessed = true;
+                commandLog.enqueueCommand(Direction.Dir.UP);
+                keyProcessed = true;  // Mark key as processed
                 break;
             case DOWN:
-                commandLog.addCommand(Direction.Dir.DOWN, arena.getHeadPosition());
+                commandLog.enqueueCommand(Direction.Dir.DOWN);
                 keyProcessed = true;
                 break;
             case LEFT:
-                commandLog.addCommand(Direction.Dir.LEFT, arena.getHeadPosition());
+                commandLog.enqueueCommand(Direction.Dir.LEFT);
                 keyProcessed = true;
                 break;
             case RIGHT:
-                commandLog.addCommand(Direction.Dir.RIGHT, arena.getHeadPosition());
+                commandLog.enqueueCommand(Direction.Dir.RIGHT);
                 keyProcessed = true;
                 break;
             default:
@@ -75,14 +75,18 @@ public class GameController {
     }
 
     private void gameLoop() {
-    	keyProcessed = false;  // Reset the flag here
         if (!isRunning) return; // Exit if the game is already over
 
-        keyProcessed = false;  // Reset this after every game loop iteration
+        keyProcessed = false;  // Reset the flag to allow new keypresses in the next frame
 
+        // Get the current direction of the snake
         Direction.Dir currentDirection = arena.getCurrentDirection();
         SnakeNode headNode = arena.getSnakeHead();
-        Direction.Dir newDirection = commandLog.getNextCommand(currentDirection, headNode);
+
+        // Fetch the next valid command
+        Direction.Dir newDirection = commandLog.getNextValidCommand(currentDirection, headNode);
+
+        // Change the snake's direction and update the arena
         arena.changeSnakeDirection(newDirection);
         arena.update();
 
@@ -95,4 +99,5 @@ public class GameController {
             stopGame("Congratulations, You Win!");
         }
     }
+
 }

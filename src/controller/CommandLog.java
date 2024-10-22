@@ -9,45 +9,39 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class CommandLog {
-    private Queue<Direction.Dir> commandQueue; // Commands waiting to be executed
-    private List<CommandEntry> commandLog;     // All executed commands
+    private Queue<Direction.Dir> commandQueue;        // Commands waiting to be processed
+    private List<CommandEntry> executedCommandLog;    // Commands that have been executed
 
     public CommandLog() {
         commandQueue = new LinkedList<>();
-        commandLog = new ArrayList<>();
+        executedCommandLog = new ArrayList<>();
     }
 
-    public void addCommand(Direction.Dir direction, int[] position) {
-        if (!commandLog.isEmpty()) {
-            CommandEntry lastEntry = commandLog.get(commandLog.size() - 1);
-            if (lastEntry.getDirection() == direction) {
-                System.out.println("Duplicate direction ignored.");
-                return;  // Ignore if the direction is the same as the last logged one
-            }
-        }
+    // Method to enqueue a command when the user inputs it
+    public void enqueueCommand(Direction.Dir direction) {
         commandQueue.add(direction);
-        commandLog.add(new CommandEntry(direction, position[0], position[1]));
-        System.out.println("Added direction: " + direction + " at position: " + position[0] + ", " + position[1]);
+        System.out.println("Enqueued direction: " + direction);
     }
 
-
- // Retrieve and remove the next command from the queue, if available
-    public Direction.Dir getNextCommand(Direction.Dir currentDirection, SnakeNode head) {
-        if (!commandQueue.isEmpty()) {
+    // Method to retrieve and execute the next valid command
+    public Direction.Dir getNextValidCommand(Direction.Dir currentDirection, SnakeNode head) {
+        while (!commandQueue.isEmpty()) {
             Direction.Dir nextDirection = commandQueue.peek();
             if (!isReversing(currentDirection, nextDirection)) {
-                commandQueue.poll();  // Remove the command from the queue once processed
-                commandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY()));
+                commandQueue.poll();  // Remove the command from the queue
+                // Log the executed command with the head's position at the time of execution
+                executedCommandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY()));
                 return nextDirection;
             } else {
-                commandQueue.poll();  // Remove invalid command
+                // Invalid command (reversing direction), discard it
+                commandQueue.poll();
             }
         }
-        return currentDirection;  // Continue in the current direction if no valid command
+        // No valid commands; continue moving in the current direction
+        return currentDirection;
     }
 
-
-    // Check if the new direction is a reverse of the current one
+    // Check if the new direction is the reverse of the current one
     private boolean isReversing(Direction.Dir current, Direction.Dir next) {
         return (current == Direction.Dir.UP && next == Direction.Dir.DOWN) ||
                (current == Direction.Dir.DOWN && next == Direction.Dir.UP) ||
@@ -55,10 +49,10 @@ public class CommandLog {
                (current == Direction.Dir.RIGHT && next == Direction.Dir.LEFT);
     }
 
-    // Print the command log for debugging or analysis purposes
-    public void printCommandLog() {
-        System.out.println("Command Log History:");
-        for (CommandEntry entry : commandLog) {
+    // Print the log of executed commands
+    public void printExecutedCommands() {
+        System.out.println("Executed Command Log:");
+        for (CommandEntry entry : executedCommandLog) {
             System.out.println(entry);
         }
     }
@@ -67,31 +61,28 @@ public class CommandLog {
         // Initialize CommandLog
         CommandLog commandLog = new CommandLog();
 
-        // Simulate adding directions with different positions
-        int[] position1 = {5, 4};
-        int[] position2 = {3, 2};
-        int[] position3 = {1, 6};
+        // Simulate adding directions
+        commandLog.enqueueCommand(Direction.Dir.UP);
+        commandLog.enqueueCommand(Direction.Dir.LEFT);
+        commandLog.enqueueCommand(Direction.Dir.DOWN);
+        commandLog.enqueueCommand(Direction.Dir.DOWN); // Will be enqueued again
 
-        // Add commands to the log
-        commandLog.addCommand(Direction.Dir.UP, position1);
-        commandLog.addCommand(Direction.Dir.LEFT, position2);
-        commandLog.addCommand(Direction.Dir.DOWN, position3);
+        // Simulate the snake's head node
+        SnakeNode fakeSnakeNode = new SnakeNode(5, 5);
+        Direction.Dir currentDirection = Direction.Dir.RIGHT;
 
-        // Add duplicate direction to test the duplicate check
-        commandLog.addCommand(Direction.Dir.DOWN, position3); // Should be ignored
-        
-        // Add a valid new direction
-        int[] position4 = {7, 8};
-        commandLog.addCommand(Direction.Dir.RIGHT, position4);
-        
-        // Print the command log history
-        commandLog.printCommandLog();
+        // Simulate executing commands
+        while (currentDirection != null) {
+            currentDirection = commandLog.getNextValidCommand(currentDirection, fakeSnakeNode);
+            System.out.println("Next direction: " + currentDirection);
+            // Break the loop if no change in direction (for testing)
+            if (commandLog.commandQueue.isEmpty()) {
+                break;
+            }
+        }
 
-        // Simulate getting the next command and print it
-        SnakeNode fakeSnakeNode = new SnakeNode(7, 8); // Simulate the snake's head at position (7, 8)
-        Direction.Dir currentDirection = Direction.Dir.UP;
-        Direction.Dir nextCommand = commandLog.getNextCommand(currentDirection, fakeSnakeNode);
-        System.out.println("Next command: " + nextCommand);
+        // Print the executed command log
+        commandLog.printExecutedCommands();
     }
 
 }
