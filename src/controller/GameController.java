@@ -45,12 +45,12 @@ public class GameController {
             timeline.stop();
             isRunning = false;
             printGameOutput(output);
-            //commandLog.printCommandLog();
+            commandLog.printCommandLog();
         }
     }
 
     public void handleKeyPress(KeyEvent event) {
-        if (keyProcessed) return;
+        if (keyProcessed) return;  // Ignore if key is already processed
 
         switch (event.getCode()) {
             case UP:
@@ -75,6 +75,7 @@ public class GameController {
     }
 
     private void gameLoop() {
+    	keyProcessed = false;  // Reset the flag here
         if (!isRunning) return; // Exit if the game is already over
 
         keyProcessed = false;  // Reset this after every game loop iteration

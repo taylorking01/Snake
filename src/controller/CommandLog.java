@@ -62,4 +62,36 @@ public class CommandLog {
             System.out.println(entry);
         }
     }
+    
+    public static void main(String[] args) {
+        // Initialize CommandLog
+        CommandLog commandLog = new CommandLog();
+
+        // Simulate adding directions with different positions
+        int[] position1 = {5, 4};
+        int[] position2 = {3, 2};
+        int[] position3 = {1, 6};
+
+        // Add commands to the log
+        commandLog.addCommand(Direction.Dir.UP, position1);
+        commandLog.addCommand(Direction.Dir.LEFT, position2);
+        commandLog.addCommand(Direction.Dir.DOWN, position3);
+
+        // Add duplicate direction to test the duplicate check
+        commandLog.addCommand(Direction.Dir.DOWN, position3); // Should be ignored
+        
+        // Add a valid new direction
+        int[] position4 = {7, 8};
+        commandLog.addCommand(Direction.Dir.RIGHT, position4);
+        
+        // Print the command log history
+        commandLog.printCommandLog();
+
+        // Simulate getting the next command and print it
+        SnakeNode fakeSnakeNode = new SnakeNode(7, 8); // Simulate the snake's head at position (7, 8)
+        Direction.Dir currentDirection = Direction.Dir.UP;
+        Direction.Dir nextCommand = commandLog.getNextCommand(currentDirection, fakeSnakeNode);
+        System.out.println("Next command: " + nextCommand);
+    }
+
 }
