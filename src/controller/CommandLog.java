@@ -1,6 +1,8 @@
 package controller;
 
 import snake.Direction;
+import snake.SnakeNode;
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 
 public class CommandLog {
     private Queue<Direction.Dir> commandQueue; // Commands waiting to be executed
-    private List<Direction.Dir> commandLog;    // All executed commands
+    private List<CommandEntry> commandLog;     // All executed commands
 
     public CommandLog() {
         commandQueue = new LinkedList<>();
@@ -21,13 +23,14 @@ public class CommandLog {
     }
 
     // Retrieve and remove the next command from the queue, if available
-    public Direction.Dir getNextCommand(Direction.Dir currentDirection) {
+    public Direction.Dir getNextCommand(Direction.Dir currentDirection, SnakeNode head) {
         // Only return the next command if it's not reversing the current direction
         if (!commandQueue.isEmpty()) {
             Direction.Dir nextDirection = commandQueue.peek();
             if (!isReversing(currentDirection, nextDirection)) {
-                commandLog.add(nextDirection); // Log the command as executed
-                return commandQueue.poll();    // Remove and return the next command
+                commandQueue.poll();  // Remove the command from the queue
+                commandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY())); // Log the executed command
+                return nextDirection;  // Return the next command
             } else {
                 commandQueue.poll();  // Invalid command, discard it
             }
@@ -46,8 +49,8 @@ public class CommandLog {
     // Print the command log for debugging or analysis purposes
     public void printCommandLog() {
         System.out.println("Command Log History:");
-        for (Direction.Dir direction : commandLog) {
-            System.out.println(direction);
+        for (CommandEntry entry : commandLog) {
+            System.out.println(entry);
         }
     }
 }

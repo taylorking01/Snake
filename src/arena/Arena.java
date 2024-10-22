@@ -109,6 +109,10 @@ public class Arena {
         }
     }
     
+    public SnakeNode getSnakeHead() {
+        return snake.getHead();
+    }
+    
     // Method to get the current direction of the snake
     public Direction.Dir getCurrentDirection() {
         return snake.getCurrentDirection();

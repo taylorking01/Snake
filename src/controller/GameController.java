@@ -2,6 +2,7 @@ package controller;
 
 import arena.Arena;
 import snake.Direction;
+import snake.SnakeNode;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -65,7 +66,8 @@ public class GameController {
     private void gameLoop() {
         // Get the next command from the log, if available, and move the snake
         Direction.Dir currentDirection = arena.getCurrentDirection();
-        Direction.Dir newDirection = commandLog.getNextCommand(currentDirection);
+        SnakeNode head = arena.getSnakeHead();  // Get the head of the snake
+        Direction.Dir newDirection = commandLog.getNextCommand(currentDirection, head);
         arena.changeSnakeDirection(newDirection);
         arena.update();  // Move snake and update grid
 
