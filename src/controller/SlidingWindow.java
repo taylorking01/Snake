@@ -1,6 +1,7 @@
 package controller;
 
 import snake.Direction;
+
 import java.util.LinkedList;
 
 public class SlidingWindow {
