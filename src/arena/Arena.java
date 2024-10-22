@@ -15,22 +15,39 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * The Arena class represents the game grid where the Snake game takes place.
+ * It manages the snake, apple, and their interactions within the game.
+ * The grid is initialized, updated, and rendered in this class.
+ */
 public class Arena {
-    private final int rows = 8;
-    private final int cols = 8;
+    private final int rows = 8; // Number of rows in the grid
+    private final int cols = 8; // Number of columns in the grid
     private final int totalCells = rows * cols; // Total number of cells in the grid
-    private final Map<String, Rectangle> tileMap = new HashMap<>();
-    private GridPane grid;
-    private SnakeLinkedList snake;
-    private Apple apple;
+    private final Map<String, Rectangle> tileMap = new HashMap<>(); // Map to store grid tiles
+    private GridPane grid; // The visual representation of the game grid
+    private SnakeLinkedList snake; // The snake object in the game
+    private Apple apple; // The apple object in the game
 
+    /**
+     * Constructs an Arena object that initializes the game grid and snake/apple entities.
+     * 
+     * @param scene The scene in which the arena will be rendered. This is used for setting up the grid display.
+     * 
+     * This constructor prepares the game grid, sets the snake and apple in their initial positions, and binds
+     * the grid size to the scene size for responsive scaling.
+     */
     public Arena(Scene scene) {
         grid = new GridPane();
         resetGame(); // Initialize the snake and apple when the game starts
         initializeGrid(scene);
     }
     
-    // Reset the game by re-initializing the snake and apple
+    /**
+     * Resets the game by initializing the snake at the center of the grid and generating a new apple.
+     * 
+     * This method is typically called at the start of a game or after a game over, and resets the state of the grid.
+     */
     public void resetGame() {
         snake = new SnakeLinkedList(cols / 2, rows / 2); // Reset the snake at center
         generateApple(); // Generate a new apple
@@ -38,6 +55,13 @@ public class Arena {
         updateAppleDisplay();
     }
 
+    /**
+     * Initializes the game grid visually by setting up a grid of tiles.
+     * 
+     * @param scene The scene in which the grid will be displayed. Used to bind tile sizes for responsive scaling.
+     * 
+     * This method sets up a GridPane with Rectangle tiles, which are resized based on the scene's dimensions.
+     */
     private void initializeGrid(Scene scene) {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -60,6 +84,11 @@ public class Arena {
         updateAppleDisplay();
     }
 
+    /**
+     * Updates the display of the snake on the grid by setting the tiles occupied by the snake to a specific color.
+     * 
+     * This method clears the grid first and then re-draws the snake's position, coloring its body on the grid.
+     */
     private void updateSnakeDisplay() {
         clearGrid(); // Reset the grid before updating
         SnakeNode current = snake.getHead();
@@ -75,6 +104,11 @@ public class Arena {
         }
     }
 
+    /**
+     * Updates the display of the apple on the grid by setting the apple's tile to a specific color.
+     * 
+     * This method identifies the current position of the apple and colors its corresponding tile on the grid.
+     */
     private void updateAppleDisplay() {
         String position = apple.getY() + "," + apple.getX();
         Rectangle tile = tileMap.get(position);
@@ -83,19 +117,33 @@ public class Arena {
         }
     }
 
-    // Clear the entire grid (reset all tiles to their default color)
+    /**
+     * Clears the entire grid by resetting all tiles to the default color.
+     * 
+     * This method is used before updating the snake's position to ensure that no old snake positions remain visible.
+     */
     private void clearGrid() {
         for (Rectangle tile : tileMap.values()) {
             tile.setFill(Color.DARKGRAY); // Reset to the default grid color
         }
     }
     
-    // Check if the snake's head is at the same position as the apple
+    /**
+     * Checks if the snake's head is at the same position as the apple.
+     * 
+     * @return true if the snake's head is on the same tile as the apple, false otherwise.
+     */
     private boolean checkAppleCollision() {
         SnakeNode head = snake.getHead();
         return head.getX() == apple.getX() && head.getY() == apple.getY();
     }
 
+    /**
+     * Updates the game state by moving the snake, checking for collisions, and potentially growing the snake.
+     * 
+     * This method handles the core game loop logic, such as moving the snake, checking if the snake ate the apple,
+     * and checking for win conditions.
+     */
     public void update() {
         snake.move();
         if (checkAppleCollision()) {
@@ -104,8 +152,6 @@ public class Arena {
             // Check if the snake has filled the entire arena (win condition)
             if (snake.getLength() == totalCells) {
                 // Trigger the win condition
-                //System.out.println("Congratulations, You Win!");
-                // Possibly stop the game here or handle it in the game controller
                 return;
             }
 
@@ -115,21 +161,43 @@ public class Arena {
         updateAppleDisplay();
     }
 
-    
+    /**
+     * Retrieves the current head of the snake.
+     * 
+     * @return The SnakeNode representing the head of the snake.
+     */
     public SnakeNode getSnakeHead() {
         return snake.getHead();
     }
     
-    // Method to get the current direction of the snake
+    /**
+     * Retrieves the current direction of the snake.
+     * 
+     * @return The current direction in which the snake is moving.
+     */
     public Direction.Dir getCurrentDirection() {
         return snake.getCurrentDirection();
     }
 
+    /**
+     * Changes the snake's direction to the specified direction.
+     * 
+     * @param direction The new direction in which the snake should move.
+     * 
+     * This method ensures that the snake's movement direction is updated without allowing a reversal.
+     */
     public void changeSnakeDirection(Direction.Dir direction) {
         snake.changeDirection(direction);
     }
 
-    // Check if the snake collides with itself or a wall
+    /**
+     * Checks if the snake has collided with itself or a wall.
+     * 
+     * @return true if the snake collides with a wall or itself, false otherwise.
+     * 
+     * This method ensures that the game is aware of when the snake has died, either from hitting a wall
+     * or its own body.
+     */
     public boolean checkCollisions() {
         SnakeNode head = snake.getHead();
         // Wall collision
@@ -147,12 +215,22 @@ public class Arena {
         return false;
     }
 
-    // Check if the player has won by filling the entire arena with the snake
+    /**
+     * Checks if the player has won the game by filling the entire arena with the snake.
+     * 
+     * @return true if the snake occupies all cells in the arena, false otherwise.
+     * 
+     * The win condition occurs when the snake has filled every cell in the grid.
+     */
     public boolean checkWinCondition() {
         return snake.getLength() == totalCells; // Win if the snake occupies all cells
     }
 
-    // Generate a new apple in a random position not occupied by the snake
+    /**
+     * Generates a new apple in a random position that is not occupied by the snake.
+     * 
+     * This method ensures that the new apple is placed in an empty cell on the grid.
+     */
     private void generateApple() {
         Random random = new Random();
         int x, y;
@@ -165,7 +243,13 @@ public class Arena {
         apple = new Apple(x, y);
     }
 
-    // Check if the snake is occupying a specific position
+    /**
+     * Checks if the snake is occupying a specific position.
+     * 
+     * @param x The x-coordinate (column) to check.
+     * @param y The y-coordinate (row) to check.
+     * @return true if the snake occupies the given position, false otherwise.
+     */
     private boolean isSnakeAtPosition(int x, int y) {
         SnakeNode current = snake.getHead();
         while (current != null) {
@@ -177,11 +261,20 @@ public class Arena {
         return false;
     }
 
+    /**
+     * Retrieves the GridPane object representing the game grid.
+     * 
+     * @return The GridPane used to visually display the arena.
+     */
     public GridPane getGrid() {
         return grid;
     }
 
-    // Method to get the head position of the snake
+    /**
+     * Retrieves the position of the snake's head as an array.
+     * 
+     * @return An array of two integers representing the (x, y) coordinates of the snake's head.
+     */
     public int[] getHeadPosition() {
         SnakeNode head = snake.getHead();
         return new int[]{head.getX(), head.getY()};
