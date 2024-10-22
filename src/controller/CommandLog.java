@@ -17,18 +17,26 @@ public class CommandLog {
         commandLog = new ArrayList<>();
     }
 
-    // Add a new direction command to the queue
-    public void addCommand(Direction.Dir direction) {
+    public void addCommand(Direction.Dir direction, int[] position) {
+        // Add this condition to check if the new direction is different from the last logged command
+        if (!commandLog.isEmpty()) {
+            CommandEntry lastEntry = commandLog.get(commandLog.size() - 1);
+            if (lastEntry.getDirection() == direction) {
+                return;  // If the direction is the same as the last logged one, ignore it
+            }
+        }
         commandQueue.add(direction);
+        commandLog.add(new CommandEntry(direction, position[0], position[1]));
     }
 
-    // Retrieve and remove the next command from the queue, if available
+
+
+ // Retrieve and remove the next command from the queue, if available
     public Direction.Dir getNextCommand(Direction.Dir currentDirection, SnakeNode head) {
-        // Only return the next command if it's not reversing the current direction
         if (!commandQueue.isEmpty()) {
             Direction.Dir nextDirection = commandQueue.peek();
             if (!isReversing(currentDirection, nextDirection)) {
-                commandQueue.poll();  // Remove the command from the queue
+                commandQueue.poll();  // Remove the command from the queue only once
                 commandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY())); // Log the executed command
                 return nextDirection;  // Return the next command
             } else {
@@ -37,6 +45,7 @@ public class CommandLog {
         }
         return currentDirection;  // Continue with the current direction if no valid command
     }
+
 
     // Check if the new direction is a reverse of the current one
     private boolean isReversing(Direction.Dir current, Direction.Dir next) {

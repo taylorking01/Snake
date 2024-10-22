@@ -16,8 +16,9 @@ import java.util.Map;
 import java.util.Random;
 
 public class Arena {
-    private final int rows = 16;
-    private final int cols = 16;
+    private final int rows = 4;
+    private final int cols = 4;
+    private final int totalCells = rows * cols; // Total number of cells in the grid
     private final Map<String, Rectangle> tileMap = new HashMap<>();
     private GridPane grid;
     private SnakeLinkedList snake;
@@ -95,19 +96,25 @@ public class Arena {
         return head.getX() == apple.getX() && head.getY() == apple.getY();
     }
 
-
     public void update() {
         snake.move();
         if (checkAppleCollision()) {
             snake.grow();
-            generateApple();
+            
+            // Check if the snake has filled the entire arena (win condition)
+            if (snake.getLength() == totalCells) {
+                // Trigger the win condition
+                System.out.println("Congratulations, You Win!");
+                // Possibly stop the game here or handle it in the game controller
+                return;
+            }
+
+            generateApple();  // Generate a new apple if the player hasn't won yet
         }
         updateSnakeDisplay();
         updateAppleDisplay();
-        if (checkCollisions()) {
-            System.out.println("Game Over!");
-        }
     }
+
     
     public SnakeNode getSnakeHead() {
         return snake.getHead();
@@ -118,7 +125,6 @@ public class Arena {
         return snake.getCurrentDirection();
     }
 
-    // Method to change the direction of the snake using Direction.Dir
     public void changeSnakeDirection(Direction.Dir direction) {
         snake.changeDirection(direction);
     }
@@ -139,6 +145,11 @@ public class Arena {
             current = current.getNext();
         }
         return false;
+    }
+
+    // Check if the player has won by filling the entire arena with the snake
+    public boolean checkWinCondition() {
+        return snake.getLength() == totalCells; // Win if the snake occupies all cells
     }
 
     // Generate a new apple in a random position not occupied by the snake
@@ -168,5 +179,11 @@ public class Arena {
 
     public GridPane getGrid() {
         return grid;
+    }
+
+    // Method to get the head position of the snake
+    public int[] getHeadPosition() {
+        SnakeNode head = snake.getHead();
+        return new int[]{head.getX(), head.getY()};
     }
 }

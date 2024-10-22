@@ -26,7 +26,7 @@ public class Window extends Application {
         BorderPane root = new BorderPane();
 
         // Set the window size to 600x600
-        Scene scene = new Scene(root, 600, 600, Color.web("#1a1a1a"));  // Dark background
+        Scene scene = new Scene(root, 700, 600, Color.web("#1a1a1a"));  // Dark background
 
         // Create the arena (16x16 grid of tiles)
         Arena arena = new Arena(scene);

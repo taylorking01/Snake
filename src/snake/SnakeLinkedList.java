@@ -5,11 +5,14 @@ public class SnakeLinkedList {
     private SnakeNode tail;
     private Direction direction;
     private boolean shouldGrow = false; // Flag to track whether the snake should grow
+    private int length; // Track the length of the snake
 
     public SnakeLinkedList(int startX, int startY) {
+        // Initialize the snake with a head segment at given position
         head = new SnakeNode(startX, startY);
         tail = head;
         direction = new Direction(Direction.Dir.RIGHT); // Initialize moving to the right
+        length = 1; // Initial length of the snake
     }
 
     // Method to move the snake by adding a new head and removing the tail
@@ -43,6 +46,9 @@ public class SnakeLinkedList {
         } else {
             shouldGrow = false; // Reset the grow flag after growing
         }
+
+        // Update length
+        length++;
     }
 
     // Method to retrieve the current direction
@@ -50,7 +56,7 @@ public class SnakeLinkedList {
         return direction.getCurrentDirection();
     }
 
-    // Method to change the direction of the snake using a Direction.Dir input
+    // Method to change the direction of the snake using a string input
     public void changeDirection(Direction.Dir newDirection) {
         direction.changeDirection(newDirection);
     }
@@ -63,6 +69,9 @@ public class SnakeLinkedList {
         }
         current.setNext(null);
         tail = current;
+
+        // Update length
+        length--;
     }
 
     // Set the flag to grow the snake on the next move
@@ -73,5 +82,10 @@ public class SnakeLinkedList {
     // Method to get the head of the snake
     public SnakeNode getHead() {
         return head;
+    }
+
+    // Method to get the length of the snake
+    public int getLength() {
+        return length;
     }
 }
