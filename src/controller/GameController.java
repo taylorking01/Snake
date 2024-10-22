@@ -13,10 +13,12 @@ public class GameController {
     private Arena arena;
     private Timeline timeline;
     private boolean isRunning;
+    private CommandLog commandLog;  // Command log to store direction inputs
 
     public GameController(Arena arena) {
         this.arena = arena;
         this.isRunning = false;
+        this.commandLog = new CommandLog();  // Initialize the command log
 
         // Initialize game timeline (animation loop)
         timeline = new Timeline(new KeyFrame(Duration.millis(300), e -> gameLoop()));
@@ -42,28 +44,32 @@ public class GameController {
     public void handleKeyPress(KeyEvent event) {
         switch (event.getCode()) {
             case UP:
-                arena.changeSnakeDirection("UP");
+                commandLog.addCommand(Direction.Dir.UP);
                 break;
             case DOWN:
-                arena.changeSnakeDirection("DOWN");
+                commandLog.addCommand(Direction.Dir.DOWN);
                 break;
             case LEFT:
-                arena.changeSnakeDirection("LEFT");
+                commandLog.addCommand(Direction.Dir.LEFT);
                 break;
             case RIGHT:
-                arena.changeSnakeDirection("RIGHT");
+                commandLog.addCommand(Direction.Dir.RIGHT);
                 break;
             default:
                 break;
         }
     }
-
+    
     // Game loop to update the arena and move the snake
     private void gameLoop() {
-        arena.update();
+        // Get the next command from the log, if available, and move the snake
+        Direction.Dir currentDirection = arena.getCurrentDirection();
+        Direction.Dir newDirection = commandLog.getNextCommand(currentDirection);
+        arena.changeSnakeDirection(newDirection);
+        arena.update();  // Move snake and update grid
+
         if (arena.checkCollisions()) {
-            stopGame(); // Stop the game on collision
-            System.out.println("Game Over! Press 'Start Game' to play again.");
+            stopGame();  // Stop the game if a collision occurs
         }
     }
 

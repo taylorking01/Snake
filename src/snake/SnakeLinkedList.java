@@ -7,7 +7,6 @@ public class SnakeLinkedList {
     private boolean shouldGrow = false; // Flag to track whether the snake should grow
 
     public SnakeLinkedList(int startX, int startY) {
-        // Initialize the snake with a head segment at given position
         head = new SnakeNode(startX, startY);
         tail = head;
         direction = new Direction(Direction.Dir.RIGHT); // Initialize moving to the right
@@ -46,8 +45,13 @@ public class SnakeLinkedList {
         }
     }
 
-    // Method to change the direction of the snake using a string input
-    public void changeDirection(String newDirection) {
+    // Method to retrieve the current direction
+    public Direction.Dir getCurrentDirection() {
+        return direction.getCurrentDirection();
+    }
+
+    // Method to change the direction of the snake using a Direction.Dir input
+    public void changeDirection(Direction.Dir newDirection) {
         direction.changeDirection(newDirection);
     }
 

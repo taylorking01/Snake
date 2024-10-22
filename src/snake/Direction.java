@@ -11,36 +11,23 @@ public class Direction {
         this.currentDirection = initialDirection;
     }
 
-    // Method to change direction based on a string
-    public void changeDirection(String newDirection) {
-        switch (newDirection.toUpperCase()) {
-            case "UP":
-                if (currentDirection != Dir.DOWN) {  // Prevent reversing
-                    currentDirection = Dir.UP;
-                }
-                break;
-            case "DOWN":
-                if (currentDirection != Dir.UP) {
-                    currentDirection = Dir.DOWN;
-                }
-                break;
-            case "LEFT":
-                if (currentDirection != Dir.RIGHT) {
-                    currentDirection = Dir.LEFT;
-                }
-                break;
-            case "RIGHT":
-                if (currentDirection != Dir.LEFT) {
-                    currentDirection = Dir.RIGHT;
-                }
-                break;
-            default:
-                System.out.println("Invalid direction! Keeping current direction.");
+    // Method to change direction based on a Dir type
+    public void changeDirection(Dir newDirection) {
+        if (!isReversing(newDirection)) {
+            currentDirection = newDirection;
         }
     }
 
     // Getter for the current direction
     public Dir getCurrentDirection() {
         return currentDirection;
+    }
+
+    // Prevent snake from reversing
+    private boolean isReversing(Dir newDirection) {
+        return (currentDirection == Dir.UP && newDirection == Dir.DOWN) ||
+               (currentDirection == Dir.DOWN && newDirection == Dir.UP) ||
+               (currentDirection == Dir.LEFT && newDirection == Dir.RIGHT) ||
+               (currentDirection == Dir.RIGHT && newDirection == Dir.LEFT);
     }
 }

@@ -1,13 +1,15 @@
 package arena;
 
+import snake.SnakeLinkedList;
+import snake.SnakeNode;
+import snake.Direction;
 import apple.Apple;
+
 import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import snake.SnakeLinkedList;
-import snake.SnakeNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,12 +108,18 @@ public class Arena {
             System.out.println("Game Over!");
         }
     }
+    
+    // Method to get the current direction of the snake
+    public Direction.Dir getCurrentDirection() {
+        return snake.getCurrentDirection();
+    }
 
-    public void changeSnakeDirection(String direction) {
+    // Method to change the direction of the snake using Direction.Dir
+    public void changeSnakeDirection(Direction.Dir direction) {
         snake.changeDirection(direction);
     }
 
- // Check if the snake collides with itself or a wall
+    // Check if the snake collides with itself or a wall
     public boolean checkCollisions() {
         SnakeNode head = snake.getHead();
         // Wall collision
