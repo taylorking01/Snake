@@ -27,6 +27,7 @@ public class GameController {
     public void startGame() {
         if (!isRunning) {
             isRunning = true;
+            arena.resetGame(); // Reset the arena when starting a new game
             timeline.play();  // Start the game loop
         }
     }
@@ -59,9 +60,10 @@ public class GameController {
 
     // Game loop to update the arena and move the snake
     private void gameLoop() {
-        arena.update();  // Move snake and update grid
+        arena.update();
         if (arena.checkCollisions()) {
-            stopGame();  // Stop the game when a collision happens
+            stopGame(); // Stop the game on collision
+            System.out.println("Game Over! Press 'Start Game' to play again.");
         }
     }
 

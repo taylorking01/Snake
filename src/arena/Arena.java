@@ -23,9 +23,16 @@ public class Arena {
 
     public Arena(Scene scene) {
         grid = new GridPane();
-        snake = new SnakeLinkedList(cols / 2, rows / 2);
-        generateApple(); // Generate the apple after the grid is initialized
+        resetGame(); // Initialize the snake and apple when the game starts
         initializeGrid(scene);
+    }
+    
+    // Reset the game by re-initializing the snake and apple
+    public void resetGame() {
+        snake = new SnakeLinkedList(cols / 2, rows / 2); // Reset the snake at center
+        generateApple(); // Generate a new apple
+        updateSnakeDisplay();
+        updateAppleDisplay();
     }
 
     private void initializeGrid(Scene scene) {
@@ -90,13 +97,13 @@ public class Arena {
     public void update() {
         snake.move();
         if (checkAppleCollision()) {
-            snake.grow(); // Grow the snake when the apple is eaten
-            generateApple(); // Generate a new apple
+            snake.grow();
+            generateApple();
         }
         updateSnakeDisplay();
         updateAppleDisplay();
         if (checkCollisions()) {
-            System.out.println("Game Over");
+            System.out.println("Game Over!");
         }
     }
 
@@ -104,26 +111,22 @@ public class Arena {
         snake.changeDirection(direction);
     }
 
+ // Check if the snake collides with itself or a wall
     public boolean checkCollisions() {
         SnakeNode head = snake.getHead();
-
-        // Wall collision detection
+        // Wall collision
         if (head.getX() < 0 || head.getX() >= cols || head.getY() < 0 || head.getY() >= rows) {
-            // Handle game over or restart logic here
-            System.out.println("Game Over! Snake hit the wall.");
-            return true; // Indicate a collision occurred
+            return true;
         }
-
-        // Self-collision detection
+        // Self-collision
         SnakeNode current = head.getNext();
         while (current != null) {
             if (head.getX() == current.getX() && head.getY() == current.getY()) {
-                System.out.println("Game Over! Snake hit itself.");
-                return true; // Indicate a collision occurred
+                return true;
             }
             current = current.getNext();
         }
-        return false; // No collision
+        return false;
     }
 
     // Generate a new apple in a random position not occupied by the snake
