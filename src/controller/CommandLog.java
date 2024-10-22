@@ -18,17 +18,17 @@ public class CommandLog {
     }
 
     public void addCommand(Direction.Dir direction, int[] position) {
-        // Add this condition to check if the new direction is different from the last logged command
         if (!commandLog.isEmpty()) {
             CommandEntry lastEntry = commandLog.get(commandLog.size() - 1);
             if (lastEntry.getDirection() == direction) {
-                return;  // If the direction is the same as the last logged one, ignore it
+                System.out.println("Duplicate direction ignored.");
+                return;  // Ignore if the direction is the same as the last logged one
             }
         }
         commandQueue.add(direction);
         commandLog.add(new CommandEntry(direction, position[0], position[1]));
+        System.out.println("Added direction: " + direction + " at position: " + position[0] + ", " + position[1]);
     }
-
 
 
  // Retrieve and remove the next command from the queue, if available
@@ -36,14 +36,14 @@ public class CommandLog {
         if (!commandQueue.isEmpty()) {
             Direction.Dir nextDirection = commandQueue.peek();
             if (!isReversing(currentDirection, nextDirection)) {
-                commandQueue.poll();  // Remove the command from the queue only once
-                commandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY())); // Log the executed command
-                return nextDirection;  // Return the next command
+                commandQueue.poll();  // Remove the command from the queue once processed
+                commandLog.add(new CommandEntry(nextDirection, head.getX(), head.getY()));
+                return nextDirection;
             } else {
-                commandQueue.poll();  // Invalid command, discard it
+                commandQueue.poll();  // Remove invalid command
             }
         }
-        return currentDirection;  // Continue with the current direction if no valid command
+        return currentDirection;  // Continue in the current direction if no valid command
     }
 
 

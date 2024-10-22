@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class Arena {
-    private final int rows = 4;
-    private final int cols = 4;
+    private final int rows = 8;
+    private final int cols = 8;
     private final int totalCells = rows * cols; // Total number of cells in the grid
     private final Map<String, Rectangle> tileMap = new HashMap<>();
     private GridPane grid;
@@ -104,7 +104,7 @@ public class Arena {
             // Check if the snake has filled the entire arena (win condition)
             if (snake.getLength() == totalCells) {
                 // Trigger the win condition
-                System.out.println("Congratulations, You Win!");
+                //System.out.println("Congratulations, You Win!");
                 // Possibly stop the game here or handle it in the game controller
                 return;
             }

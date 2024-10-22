@@ -1,86 +1,97 @@
 package controller;
 
-import arena.Arena;
-import snake.SnakeNode;
-import snake.Direction;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Duration;
+import snake.Direction;
+import snake.SnakeNode;
+import arena.Arena;
 
 public class GameController {
     private Arena arena;
     private Timeline timeline;
     private boolean isRunning;
-    private CommandLog commandLog;  // Command log to store direction inputs
+    private CommandLog commandLog;
+    private boolean keyProcessed;
 
     public GameController(Arena arena) {
         this.arena = arena;
         this.isRunning = false;
-        this.commandLog = new CommandLog();  // Initialize the command log
+        this.commandLog = new CommandLog();
+        this.keyProcessed = false;
 
         // Initialize game timeline (animation loop)
         timeline = new Timeline(new KeyFrame(Duration.millis(300), e -> gameLoop()));
-        timeline.setCycleCount(Timeline.INDEFINITE); // Run indefinitely
+        timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
-    // Method to start the game
     public void startGame() {
         if (!isRunning) {
             isRunning = true;
-            commandLog = new CommandLog();  // Reset the command log for the new game
-            arena.resetGame(); // Reset the arena when starting a new game
-            timeline.play();  // Start the game loop
+            commandLog = new CommandLog();
+            keyProcessed = false;
+            arena.resetGame();
+            timeline.play();
+        }
+    }
+    
+    public void printGameOutput(String output) {
+    	System.out.println(output);
+    }
+
+    public void stopGame(String output) {
+        if (isRunning) {
+            timeline.stop();
+            isRunning = false;
+            printGameOutput(output);
+            //commandLog.printCommandLog();
         }
     }
 
-    // Method to stop the game
-    public void stopGame() {
-        timeline.stop();
-        isRunning = false;
-        commandLog.printCommandLog(); // Print the command log when the game ends
-    }
-
- // Method to control the snake's direction based on key press
     public void handleKeyPress(KeyEvent event) {
-        int[] headPosition = arena.getHeadPosition(); // Get the current head position
+        if (keyProcessed) return;
+
         switch (event.getCode()) {
             case UP:
-                commandLog.addCommand(Direction.Dir.UP, headPosition);
+                commandLog.addCommand(Direction.Dir.UP, arena.getHeadPosition());
+                keyProcessed = true;
                 break;
             case DOWN:
-                commandLog.addCommand(Direction.Dir.DOWN, headPosition);
+                commandLog.addCommand(Direction.Dir.DOWN, arena.getHeadPosition());
+                keyProcessed = true;
                 break;
             case LEFT:
-                commandLog.addCommand(Direction.Dir.LEFT, headPosition);
+                commandLog.addCommand(Direction.Dir.LEFT, arena.getHeadPosition());
+                keyProcessed = true;
                 break;
             case RIGHT:
-                commandLog.addCommand(Direction.Dir.RIGHT, headPosition);
+                commandLog.addCommand(Direction.Dir.RIGHT, arena.getHeadPosition());
+                keyProcessed = true;
                 break;
             default:
                 break;
         }
     }
 
- // Game loop to update the arena and move the snake
     private void gameLoop() {
-        // Get the next command from the log, if available, and move the snake
-        Direction.Dir currentDirection = arena.getCurrentDirection();
-        SnakeNode headNode = arena.getSnakeHead();  // Get the snake's head node
+        if (!isRunning) return; // Exit if the game is already over
 
+        keyProcessed = false;  // Reset this after every game loop iteration
+
+        Direction.Dir currentDirection = arena.getCurrentDirection();
+        SnakeNode headNode = arena.getSnakeHead();
         Direction.Dir newDirection = commandLog.getNextCommand(currentDirection, headNode);
         arena.changeSnakeDirection(newDirection);
-        arena.update();  // Move snake and update grid
+        arena.update();
 
+        // Stop game if a collision occurs
         if (arena.checkCollisions()) {
-            System.out.println("Game Over!");
-            stopGame();  // Stop the game if a collision occurs
-        } else if (arena.checkWinCondition()) {
-            System.out.println("Congratulations, You Win!");
-            stopGame();  // Stop the game when the player wins
+            stopGame("Game Over!");
+        } 
+        // Stop game if win condition is met
+        else if (arena.checkWinCondition()) {
+            stopGame("Congratulations, You Win!");
         }
     }
-
 }
