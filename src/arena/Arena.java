@@ -7,7 +7,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import snake.SnakeLinkedList;
 import snake.SnakeNode;
-import snake.SnakeLinkedList.Direction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +77,8 @@ public class Arena {
         checkCollisions();    // Check for wall or self-collisions
     }
 
-    // Method to change the snake's direction
-    public void changeSnakeDirection(Direction direction) {
+    // Method to change the snake's direction using a string input
+    public void changeSnakeDirection(String direction) {
         snake.changeDirection(direction);
     }
 

@@ -136,4 +136,3 @@ public class Window extends Application {
         launch(args);  // Launch the JavaFX application
     }
 }
-
