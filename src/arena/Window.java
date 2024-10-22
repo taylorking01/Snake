@@ -117,18 +117,20 @@ public class Window extends Application {
         leftPane.setPrefWidth(120);  // Give the left pane a higher priority width
         leftPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
 
-        // Create and configure the right pane with the "Stats" button
+        // Create right pane
         VBox rightPane = new VBox();
         rightPane.setPadding(new Insets(10));
-        rightPane.setAlignment(Pos.CENTER);  // Center-align the button
-        Button statsButton = new Button("Stats");
-        statsButton.setOnMouseEntered(e -> statsButton.setStyle(buttonHoverStyle));
-        statsButton.setOnMouseExited(e -> statsButton.setStyle(buttonStyle));
-        statsButton.setOnMousePressed(e -> statsButton.setStyle(buttonClickStyle));
-        statsButton.setOnMouseReleased(e -> statsButton.setStyle(buttonHoverStyle));
-        rightPane.getChildren().add(statsButton);
+        rightPane.setAlignment(Pos.CENTER);  // Center-align the buttons
+        Button trainButton = new Button("Train AI");
+        //trainButton.setOnAction(e -> controller.startTraining());
+        trainButton.setOnMouseEntered(e -> trainButton.setStyle(buttonHoverStyle));
+        trainButton.setOnMouseExited(e -> trainButton.setStyle(buttonStyle));
+        trainButton.setOnMousePressed(e -> trainButton.setStyle(buttonClickStyle));
+        trainButton.setOnMouseReleased(e -> trainButton.setStyle(buttonHoverStyle));
+        rightPane.getChildren().add(trainButton);
         rightPane.setPrefWidth(120);  // Give the right pane a higher priority width
         rightPane.setStyle("-fx-background-color: " + darkGrey + ";");  // Dark grey background
+
 
         // Create a StackPane to contain the arena grid and ensure it's centered
         StackPane centerPane = new StackPane();
