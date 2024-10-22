@@ -4,6 +4,7 @@ public class SnakeLinkedList {
     private SnakeNode head;
     private SnakeNode tail;
     private Direction direction;
+    private boolean shouldGrow = false; // Flag to track whether the snake should grow
 
     public SnakeLinkedList(int startX, int startY) {
         // Initialize the snake with a head segment at given position
@@ -37,7 +38,12 @@ public class SnakeLinkedList {
         newHead.setNext(head);
         head = newHead;
 
-        removeTail(); // Remove the tail, unless we want to grow the snake
+        // Remove the tail unless the snake should grow
+        if (!shouldGrow) {
+            removeTail();
+        } else {
+            shouldGrow = false; // Reset the grow flag after growing
+        }
     }
 
     // Method to change the direction of the snake using a string input
@@ -55,8 +61,9 @@ public class SnakeLinkedList {
         tail = current;
     }
 
+    // Set the flag to grow the snake on the next move
     public void grow() {
-        // Called when the snake eats food, don't remove the tail here
+        shouldGrow = true;
     }
 
     // Method to get the head of the snake

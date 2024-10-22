@@ -1,11 +1,14 @@
 package arena;
 
+import controller.GameController;
+
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -27,6 +30,9 @@ public class Window extends Application {
 
         // Create the arena (16x16 grid of tiles)
         Arena arena = new Arena(scene);
+        
+        //Create a game controller
+        GameController controller = new GameController(arena);
 
         // Define colors
         String darkGrey = "#1a1a1a";  // Very dark grey
@@ -60,6 +66,7 @@ public class Window extends Application {
         topPane.setPadding(new Insets(10));
         topPane.setAlignment(Pos.CENTER);  // Center-align the buttons
         Button startButton = new Button("Start Game");
+        startButton.setOnAction(e -> controller.startGame());
         startButton.setOnMouseEntered(e -> startButton.setStyle(buttonHoverStyle));
         startButton.setOnMouseExited(e -> startButton.setStyle(buttonStyle));
         startButton.setOnMousePressed(e -> startButton.setStyle(buttonClickStyle));
@@ -127,6 +134,8 @@ public class Window extends Application {
         // Fix: Style the BorderPane background directly
         root.setStyle("-fx-background-color: " + darkGrey + ";");
 
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, controller::handleKeyPress);
+        
         // Set the scene to the stage
         primaryStage.setScene(scene);
         primaryStage.show();  // Show the window

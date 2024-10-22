@@ -15,7 +15,7 @@ public class Direction {
     public void changeDirection(String newDirection) {
         switch (newDirection.toUpperCase()) {
             case "UP":
-                if (currentDirection != Dir.DOWN) {
+                if (currentDirection != Dir.DOWN) {  // Prevent reversing
                     currentDirection = Dir.UP;
                 }
                 break;
