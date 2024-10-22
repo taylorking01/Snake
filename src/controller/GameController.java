@@ -5,7 +5,6 @@ import snake.Direction;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Duration;
 
@@ -29,6 +28,7 @@ public class GameController {
     public void startGame() {
         if (!isRunning) {
             isRunning = true;
+            commandLog = new CommandLog();  // Reset the command log for the new game
             arena.resetGame(); // Reset the arena when starting a new game
             timeline.play();  // Start the game loop
         }
@@ -38,6 +38,7 @@ public class GameController {
     public void stopGame() {
         timeline.stop();
         isRunning = false;
+        commandLog.printCommandLog(); // Print the command log when the game ends
     }
 
     // Method to control the snake's direction based on key press
@@ -59,7 +60,7 @@ public class GameController {
                 break;
         }
     }
-    
+
     // Game loop to update the arena and move the snake
     private void gameLoop() {
         // Get the next command from the log, if available, and move the snake
@@ -72,5 +73,4 @@ public class GameController {
             stopGame();  // Stop the game if a collision occurs
         }
     }
-
 }
