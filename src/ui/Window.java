@@ -35,30 +35,32 @@ public class Window extends Application {
     public static void changePage(String pageName) {
         BorderPane root = new BorderPane();  // New root layout
 
+        Scene scene = primaryStage.getScene(); // Access current scene
+        
         switch (pageName.toLowerCase()) {
-        	case "mainmenu":
-        	default:
-        		MainMenu mainMenu = new MainMenu();
-        		root.setCenter(mainMenu.getLayout());  // Load the main menu layout
-        		break;
+            case "mainmenu":
+            default:
+                MainMenu mainMenu = new MainMenu();
+                root.setCenter(mainMenu.getLayout());  // Load the main menu layout
+                break;
             case "playpage":
                 PlayPage playPage = new PlayPage();
                 root.setCenter(playPage.getLayout());  // Load the play page layout
                 break;
             case "classicmodepage":
-            	ClassicModePage classicModePage = new ClassicModePage();
-            	root.setCenter(classicModePage.getLayout());
-            	break;
+                ClassicModePage classicModePage = new ClassicModePage(scene); // Pass scene to ClassicModePage
+                root.setCenter(classicModePage.getLayout());
+                break;
         }
 
-        // Use Color.valueOf() to convert string color to Color object
+        // Set background color
         Color myCol = Color.valueOf(StyleConfig.BACKGROUND_COLOR);
         root.setStyle("-fx-background-color: " + toHex(myCol) + ";");
 
-        // Update the scene in the primaryStage
-        Scene scene = new Scene(root, 600, 400);
-        primaryStage.setScene(scene);
+        // Update the root layout in the current scene
+        scene.setRoot(root);
     }
+
 
     // Static helper method to convert Color to hex string for CSS styling
     public static String toHex(Color color) {
