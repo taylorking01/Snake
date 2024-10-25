@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 
 public class Window extends Application {
 
@@ -20,7 +21,10 @@ public class Window extends Application {
         // Load the main menu
         MainMenu mainMenu = new MainMenu();
         root.setCenter(mainMenu.getLayout());
-        root.setStyle("-fx-background-color: " + toHex(StyleConfig.BACKGROUND_COLOR) + ";");
+
+        // Use Color.valueOf() to convert string color to Color object
+        Color myCol = Color.valueOf(StyleConfig.BACKGROUND_COLOR);
+        root.setStyle("-fx-background-color: " + toHex(myCol) + ";");
 
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
@@ -43,8 +47,9 @@ public class Window extends Application {
                 break;
         }
 
-        // Style the root background color consistently
-        root.setStyle("-fx-background-color: " + toHex(StyleConfig.BACKGROUND_COLOR) + ";");
+        // Use Color.valueOf() to convert string color to Color object
+        Color myCol = Color.valueOf(StyleConfig.BACKGROUND_COLOR);
+        root.setStyle("-fx-background-color: " + toHex(myCol) + ";");
 
         // Update the scene in the primaryStage
         Scene scene = new Scene(root, 600, 400);
@@ -52,7 +57,7 @@ public class Window extends Application {
     }
 
     // Static helper method to convert Color to hex string for CSS styling
-    public static String toHex(javafx.scene.paint.Color color) {
+    public static String toHex(Color color) {
         return String.format("#%02X%02X%02X",
             (int)(color.getRed() * 255),
             (int)(color.getGreen() * 255),
