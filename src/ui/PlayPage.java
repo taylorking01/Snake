@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class PlayPage {
 
@@ -11,20 +12,46 @@ public class PlayPage {
 
     public PlayPage() {
         layout = new BorderPane();
+        
+        Button classicButton = new Button("Classic");
+        applyButtonStyles(classicButton, 150);
+        
+        //Center classic button
+        VBox centerBox = new VBox(classicButton);
+        centerBox.setAlignment(Pos.CENTER);
+        layout.setCenter(centerBox);
 
-        // Create the back button
+        // Create the back button and apply the base style from StyleConfig
         Button backButton = new Button("Back");
-        backButton.setStyle(StyleConfig.getBackButtonStyle());  // Apply back button style
+        applyButtonStyles(backButton, 100);
 
-        // Apply hover and click effects
-        backButton.setOnMouseEntered(e -> backButton.setStyle(StyleConfig.getHoverButtonStyle()));
-        backButton.setOnMouseExited(e -> backButton.setStyle(StyleConfig.getBackButtonStyle()));
-        backButton.setOnMousePressed(e -> backButton.setStyle(StyleConfig.getClickButtonStyle()));
-        backButton.setOnMouseReleased(e -> backButton.setStyle(StyleConfig.getHoverButtonStyle()));
+        // Define action for the back button to navigate to the main menu
+        backButton.setOnAction(e -> {
+            toggleButtonEffect(backButton);
+            Window.changePage("mainmenu");  // Navigate back to main menu
+        });
 
         HBox backButtonBox = new HBox(backButton);
         backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align the back button at bottom left
         layout.setBottom(backButtonBox);
+    }
+
+    // Helper method to apply styles and effects to buttons
+    private void applyButtonStyles(Button button, int width) {
+        button.setPrefWidth(width);  // Set a preferred width for back button
+        button.setStyle(StyleConfig.getBaseButtonStyle());
+
+        button.setOnMouseEntered(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
+        button.setOnMouseExited(e -> button.setStyle(StyleConfig.getBaseButtonStyle()));
+        button.setOnMousePressed(e -> button.setStyle(StyleConfig.getClickButtonStyle()));
+        button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
+    }
+
+    // Method to create a toggle effect for visual feedback
+    private void toggleButtonEffect(Button button) {
+        button.setStyle(StyleConfig.getClickButtonStyle());
+        // Reset style to hover style shortly after click
+        button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
     }
 
     public BorderPane getLayout() {
