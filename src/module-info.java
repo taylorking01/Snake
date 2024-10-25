@@ -4,4 +4,5 @@ module Snake {
 	requires javafx.graphics;
 
     exports arena; // Export the arena package so JavaFX can access it
+    exports ui;
 }
