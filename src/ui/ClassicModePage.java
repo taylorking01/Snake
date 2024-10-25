@@ -6,29 +6,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class PlayPage {
-
+public class ClassicModePage {
+	
     private BorderPane layout;
-
-    public PlayPage() {
-        layout = new BorderPane();
-        
-        //Classic Mode button
-        Button classicButton = new Button("Classic Mode");
-        applyButtonStyles(classicButton, 250);
-        
-        // Define action for the back button to navigate to the main menu
-        classicButton.setOnAction(e -> {
-            toggleButtonEffect(classicButton);
-            Window.changePage("classicmodepage");  // Navigate to classicmode
-        });
-        
-        //Center classic button
-        VBox centerBox = new VBox(classicButton);
-        centerBox.setAlignment(Pos.CENTER);
-        layout.setCenter(centerBox);
-
-        //Back button
+    
+    public ClassicModePage() {
+    	layout = new BorderPane();
+    	
+    	//Back button
         // Create the back button and apply the base style from StyleConfig
         Button backButton = new Button("Back");
         applyButtonStyles(backButton, 100);
@@ -36,15 +21,15 @@ public class PlayPage {
         // Define action for the back button to navigate to the main menu
         backButton.setOnAction(e -> {
             toggleButtonEffect(backButton);
-            Window.changePage("mainmenu");  // Navigate back to main menu
+            Window.changePage("playpage");  // Navigate back to main menu
         });
 
         HBox backButtonBox = new HBox(backButton);
         backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align the back button at bottom left
         layout.setBottom(backButtonBox);
     }
-
-    // Helper method to apply styles and effects to buttons
+    
+ // Helper method to apply styles and effects to buttons
     private void applyButtonStyles(Button button, int width) {
         button.setPrefWidth(width);  // Set a preferred width for back button
         button.setStyle(StyleConfig.getBaseButtonStyle());
@@ -65,4 +50,10 @@ public class PlayPage {
     public BorderPane getLayout() {
         return layout;
     }
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -45,7 +45,7 @@ public class MainMenu {
         // Define actions for the play button click
         playButton.setOnAction(e -> {
         	toggleButtonEffect(playButton);
-            Window.changePage("play");
+            Window.changePage("playpage");
         });
 
         // Arrange elements in layout

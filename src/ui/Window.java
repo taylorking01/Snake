@@ -36,15 +36,19 @@ public class Window extends Application {
         BorderPane root = new BorderPane();  // New root layout
 
         switch (pageName.toLowerCase()) {
-            case "play":
+        	case "mainmenu":
+        	default:
+        		MainMenu mainMenu = new MainMenu();
+        		root.setCenter(mainMenu.getLayout());  // Load the main menu layout
+        		break;
+            case "playpage":
                 PlayPage playPage = new PlayPage();
                 root.setCenter(playPage.getLayout());  // Load the play page layout
                 break;
-            case "mainmenu":
-            default:
-                MainMenu mainMenu = new MainMenu();
-                root.setCenter(mainMenu.getLayout());  // Load the main menu layout
-                break;
+            case "classicmodepage":
+            	ClassicModePage classicModePage = new ClassicModePage();
+            	root.setCenter(classicModePage.getLayout());
+            	break;
         }
 
         // Use Color.valueOf() to convert string color to Color object
