@@ -7,31 +7,62 @@ import javafx.stage.Stage;
 
 public class Window extends Application {
 
+    private static Stage primaryStage;
+
     @Override
     public void start(Stage primaryStage) {
-        // Set window title
+        Window.primaryStage = primaryStage;  // Store the reference to primaryStage
+
         primaryStage.setTitle("Snake Game");
 
-        // Create a root layout (BorderPane)
         BorderPane root = new BorderPane();
 
-        // Create the main menu
+        // Load the main menu
         MainMenu mainMenu = new MainMenu();
-
-        // Set the main menu layout at the center of the root
         root.setCenter(mainMenu.getLayout());
+        root.setStyle("-fx-background-color: " + toHex(StyleConfig.BACKGROUND_COLOR) + ";");
 
-        // Create a scene with the root layout
         Scene scene = new Scene(root, 600, 400);
-
-        // Set the scene to the stage
         primaryStage.setScene(scene);
-
-        // Show the window
         primaryStage.show();
     }
 
-    // Main entry point
+    // Static method to change between different pages
+    public static void changePage(String pageName) {
+        BorderPane root = new BorderPane();  // New root layout
+
+        switch (pageName.toLowerCase()) {
+            case "play":
+                PlayPage playPage = new PlayPage();
+                root.setCenter(playPage.getLayout());  // Load the play page layout
+                break;
+            case "mainmenu":
+            default:
+                MainMenu mainMenu = new MainMenu();
+                root.setCenter(mainMenu.getLayout());  // Load the main menu layout
+                break;
+        }
+
+        // Style the root background color consistently
+        root.setStyle("-fx-background-color: " + toHex(StyleConfig.BACKGROUND_COLOR) + ";");
+
+        // Update the scene in the primaryStage
+        Scene scene = new Scene(root, 600, 400);
+        primaryStage.setScene(scene);
+    }
+
+    // Static helper method to convert Color to hex string for CSS styling
+    public static String toHex(javafx.scene.paint.Color color) {
+        return String.format("#%02X%02X%02X",
+            (int)(color.getRed() * 255),
+            (int)(color.getGreen() * 255),
+            (int)(color.getBlue() * 255));
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     public static void main(String[] args) {
         launch(args);  // Launch the JavaFX application
     }
