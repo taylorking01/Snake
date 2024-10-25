@@ -10,6 +10,7 @@ public class Layer {
     private Function<double[], double[]> activationFunction;
     private double[] outputs;
 
+    // Constructor: Initializes weights, biases, and sets the activation function
     public Layer(int inputSize, int outputSize, Function<double[], double[]> activationFunction) {
         this.weights = new double[outputSize][inputSize];
         this.biases = new double[outputSize];
@@ -17,17 +18,18 @@ public class Layer {
         initializeWeightsAndBiases();
     }
 
+    // Initializes weights and biases with random values
     private void initializeWeightsAndBiases() {
-        Random rand = new Random(); // Random generator for integer values
+        Random rand = new Random();
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[i].length; j++) {
-                weights[i][j] = rand.nextInt(3) + 1; //Values 1, 2, or 3
+                weights[i][j] = rand.nextInt(3) + 1; // Random values between 1 and 3
             }
             biases[i] = 1; // Set all biases to 1
         }
     }
 
-
+    // Forward pass through the layer
     public void forward(double[] inputs) {
         this.inputs = inputs;
         double[] weightedSums = new double[biases.length];
@@ -45,104 +47,54 @@ public class Layer {
         outputs = activationFunction.apply(weightedSums);
     }
 
+    // Returns the output of the layer after activation
     public double[] getOutputs() {
         return outputs;
     }
 
-    // Activation functions
-    public static Function<double[], double[]> relu = x -> {
-        double[] result = new double[x.length];
-        for (int i = 0; i < x.length; i++) {
-            result[i] = Math.max(0, x[i]); // ReLU: max(0, x)
-        }
-        return result;
-    };
+    // Finds the index of the highest probability in the output layer
+    public int getHighestProbabilityIndex() {
+        double maxOutput = outputs[0];
+        int maxIndex = 0;
 
-    public static Function<double[], double[]> softmax = x -> {
-        // Find max value for numerical stability (to prevent overflow in exponentiation)
-        double max = x[0];
-        for (int i = 1; i < x.length; i++) {
-            if (x[i] > max) {
-                max = x[i];
+        for (int i = 1; i < outputs.length; i++) {
+            if (outputs[i] > maxOutput) {
+                maxOutput = outputs[i];
+                maxIndex = i;
             }
         }
+        return maxIndex;
+    }
 
-        // Compute exponentials and sum
-        double[] expValues = new double[x.length];
-        double sum = 0.0;
-        for (int i = 0; i < x.length; i++) {
-            expValues[i] = Math.exp(x[i] - max); // Subtract max for numerical stability
-            sum += expValues[i];
-        }
-
-        // Normalize the exponentials to get probabilities
-        for (int i = 0; i < expValues.length; i++) {
-            expValues[i] /= sum;
-        }
-
-        return expValues;
-    };
-    
     public static void main(String[] args) {
-        // Initialize random number generator
-        Random random = new Random();
+        // Example setup for the Layer class with ActivationFunction
 
-        // Generate 5 random values for the environment (0 for wall, 1 for snake body, 2 for clear, 3 for apple)
-        int[] environment = new int[5];
-        for (int i = 0; i < environment.length; i++) {
-            environment[i] = random.nextInt(4); // Random values between 0 and 3
-        }
-
-        // Prepare input for the 15 neurons: 3 sets of 5 values (walls, snake, apple)
-        double[] inputData = new double[15];
-        
-        for (int i = 0; i < 5; i++) {
-            // Set the first 5 neurons to represent walls
-            inputData[i] = (environment[i] == 0) ? 1.0 : 0.0; // If it's a wall, set it to 1, otherwise 0
-
-            // Set the next 5 neurons to represent snake body
-            inputData[i + 5] = (environment[i] == 1) ? 1.0 : 0.0; // If it's snake body, set it to 1, otherwise 0
-
-            // Set the final 5 neurons to represent apple
-            inputData[i + 10] = (environment[i] == 3) ? 1.0 : 0.0; // If it's an apple, set it to 1, otherwise 0
-        }
-
-        // Print out the environment for debugging
-        System.out.println("Generated environment: ");
-        for (int i = 0; i < environment.length; i++) {
-            System.out.println("Square " + i + ": " + environment[i] + " (0=Wall, 1=Snake Body, 2=Clear, 3=Apple)");
-        }
+        // Create an input environment (0=Wall, 1=Snake Body, 2=Clear, 3=Apple)
+        double[] inputData = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0};
 
         // Construct layers
-        Layer inputLayer = new Layer(15, 9, Layer.relu); // Input to Hidden Layer 1 (15 -> 9)
-        Layer hiddenLayer1 = new Layer(9, 6, Layer.relu); // Hidden Layer 1 to Hidden Layer 2 (9 -> 6)
-        Layer hiddenLayer2 = new Layer(6, 3, Layer.softmax); // Hidden Layer 2 to Output Layer (6 -> 3)
+        Layer inputLayer = new Layer(15, 9, ActivationFunction.relu); // Input to hidden layer
+        Layer hiddenLayer1 = new Layer(9, 6, ActivationFunction.relu); // Hidden layer 1 to hidden layer 2
+        Layer hiddenLayer2 = new Layer(6, 3, ActivationFunction.softmax); // Hidden layer to output layer
 
         // Forward pass through the layers
         inputLayer.forward(inputData);
-        double[] hiddenLayer1Outputs = inputLayer.getOutputs(); // Outputs of first hidden layer
+        double[] hiddenLayer1Outputs = inputLayer.getOutputs();
 
         hiddenLayer1.forward(hiddenLayer1Outputs);
-        double[] hiddenLayer2Outputs = hiddenLayer1.getOutputs(); // Outputs of second hidden layer
+        double[] hiddenLayer2Outputs = hiddenLayer1.getOutputs();
 
         hiddenLayer2.forward(hiddenLayer2Outputs);
-        double[] outputLayerOutputs = hiddenLayer2.getOutputs(); // Final output
+        double[] outputLayerOutputs = hiddenLayer2.getOutputs();
 
-        // Output the results (softmax probabilities)
+        // Print final output probabilities
         System.out.println("Output Layer Probabilities:");
         for (double output : outputLayerOutputs) {
             System.out.println(output);
         }
-        
-        // Find and display the largest output
-        double maxOutput = outputLayerOutputs[0];
-        int maxIndex = 0;
-        for (int i = 1; i < outputLayerOutputs.length; i++) {
-            if (outputLayerOutputs[i] > maxOutput) {
-                maxOutput = outputLayerOutputs[i];
-                maxIndex = i;
-            }
-        }
 
-        System.out.println("The largest output is at index " + maxIndex + " with a value of " + maxOutput);
-    }}
+        // Get the highest probability index and value
+        int decisionIndex = hiddenLayer2.getHighestProbabilityIndex();
+        System.out.println("The highest probability is at index " + decisionIndex + " with a probability of " + outputLayerOutputs[decisionIndex]);
+    }
+}

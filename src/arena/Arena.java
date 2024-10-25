@@ -77,23 +77,101 @@ public class Arena {
 
     /**
      * Updates the visual display of the snake on the grid by coloring the grid cells occupied by the snake.
+     * Adds vision squares to represent the snake's field of vision around the head.
      *
-     * The grid is first cleared, then the snake's body is displayed in green.
+     * The grid is first cleared, then the snake's body is displayed in green, the head in dark green,
+     * and vision squares are displayed in purple. If an apple is detected within the vision area, 
+     * the respective square is turned blue, and if a part of the snake's body is in the vision area, 
+     * it is turned yellow.
      */
     private void updateSnakeDisplay() {
         clearGrid();  // Reset the grid before updating
         SnakeNode current = snake.getHead();
+        boolean isHead = true;  // Flag to identify the head of the snake
 
         // Traverse through the snake linked list and update the grid
         while (current != null) {
             String position = current.getY() + "," + current.getX();
             Rectangle tile = tileMap.get(position);
             if (tile != null) {
-                tile.setFill(Color.LIMEGREEN);  // Snake body color
+                if (isHead) {
+                    tile.setFill(Color.DARKGREEN);  // Color the head as dark green
+                    isHead = false;  // After setting head color, set flag to false
+                } else {
+                    tile.setFill(Color.LIMEGREEN);  // Color the body as lime green
+                }
             }
             current = current.getNext();
         }
+
+        // Get the head node and current direction of the snake
+        SnakeNode headNode = snake.getHead();
+        Direction.Dir direction = snake.getCurrentDirection();
+
+        // Define vision square offsets based on the snake's current direction
+        int[][] visionOffsets = new int[5][2];
+        switch (direction) {
+            case UP:
+                visionOffsets = new int[][]{
+                    {-1, 0},  // Directly in front
+                    {-1, -1}, // Left diagonal
+                    {-1, 1},  // Right diagonal
+                    {0, -1},  // Left side
+                    {0, 1}    // Right side
+                };
+                break;
+            case DOWN:
+                visionOffsets = new int[][]{
+                    {1, 0},   // Directly in front
+                    {1, -1},  // Left diagonal
+                    {1, 1},   // Right diagonal
+                    {0, -1},  // Left side
+                    {0, 1}    // Right side
+                };
+                break;
+            case LEFT:
+                visionOffsets = new int[][]{
+                    {0, -1},  // Directly in front
+                    {-1, -1}, // Left diagonal
+                    {1, -1},  // Right diagonal
+                    {-1, 0},  // Left side
+                    {1, 0}    // Right side
+                };
+                break;
+            case RIGHT:
+                visionOffsets = new int[][]{
+                    {0, 1},   // Directly in front
+                    {-1, 1},  // Left diagonal
+                    {1, 1},   // Right diagonal
+                    {-1, 0},  // Left side
+                    {1, 0}    // Right side
+                };
+                break;
+        }
+
+        // Apply the vision squares based on the contents
+        for (int[] offset : visionOffsets) {
+            int visionY = headNode.getY() + offset[0];
+            int visionX = headNode.getX() + offset[1];
+            String visionPosition = visionY + "," + visionX;
+            Rectangle visionTile = tileMap.get(visionPosition);
+
+            if (visionTile != null) {
+                // Check if an apple is at the vision position
+                if (apple.getX() == visionX && apple.getY() == visionY) {
+                    visionTile.setFill(Color.BLUE);  // Color vision tile blue if it contains an apple
+                }
+                // Check if the snake's body is at the vision position
+                else if (isSnakeAtPosition(visionX, visionY)) {
+                    visionTile.setFill(Color.YELLOW);  // Color vision tile yellow if it contains part of the snake
+                } else {
+                    visionTile.setFill(Color.PURPLE);  // Default vision color if empty
+                }
+            }
+        }
     }
+
+
 
     /**
      * Updates the visual display of the apple on the grid by coloring the grid cell occupied by the apple.
