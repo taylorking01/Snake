@@ -1,11 +1,13 @@
 package ui;
 
 import arena.Arena;
+import controller.GameController;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -22,7 +24,10 @@ public class ClassicModePage {
         // Initialize the game arena
         arena = new Arena(scene);
         
-        // Center the arena grid with dynamic resizing
+        GameController controller = new GameController(arena);
+
+        
+     // Center the arena grid with dynamic resizing
         StackPane centerPane = new StackPane();
         centerPane.setPadding(new Insets(10));
         centerPane.getChildren().add(arena.getGrid());
@@ -31,26 +36,27 @@ public class ClassicModePage {
         // Bind arena grid size to 60% of the scene's size for dynamic resizing
         centerPane.maxWidthProperty().bind(Bindings.min(scene.widthProperty().multiply(0.6), scene.heightProperty().multiply(0.6)));
         centerPane.maxHeightProperty().bind(centerPane.maxWidthProperty());
-        
-        layout.setCenter(centerPane); // Set the arena grid in the center of the layout
 
-        // "Play" button setup beneath the arena
+        // "Play" button setup
         Button playButton = new Button("Play");
         applyButtonStyles(playButton, 150);
 
         // Define action for the "Play" button
         playButton.setOnAction(e -> {
             toggleButtonEffect(playButton);
+            controller.startGame();
             // Add logic here to start the game
         });
 
-        // Place the "Play" button in a VBox beneath the arena
-        VBox playButtonBox = new VBox(playButton);
-        playButtonBox.setAlignment(Pos.CENTER);
-        playButtonBox.setPadding(new Insets(20, 0, 0, 0)); // Padding above the button
-        layout.setBottom(playButtonBox);
+        // Combine the arena and "Play" button in a VBox to center them together
+        VBox centerBox = new VBox(20, centerPane, playButton); // 20 spacing between arena and button
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setPadding(new Insets(20, 0, 0, 0));
 
-      //Back button
+        // Set the combined VBox as the center of the layout
+        layout.setCenter(centerBox);
+
+        //Back button
         // Create the back button and apply the base style from StyleConfig
         Button backButton = new Button("Back");
         applyButtonStyles(backButton, 100);
@@ -64,6 +70,9 @@ public class ClassicModePage {
         HBox backButtonBox = new HBox(backButton);
         backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align the back button at bottom left
         layout.setBottom(backButtonBox);
+        
+        // Add event filter to handle key presses for controlling the snake
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, controller::handleKeyPress);
     }
 
     // Helper method to apply styles and effects to buttons

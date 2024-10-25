@@ -60,8 +60,8 @@ public class Arena {
                 Rectangle tile = new Rectangle();
 
                 // Bind the tile size to the smaller dimension of the scene
-                tile.widthProperty().bind(Bindings.min(scene.widthProperty().multiply(0.7).divide(cols),
-                                                       scene.heightProperty().multiply(0.7).divide(rows)));
+                tile.widthProperty().bind(Bindings.min(scene.widthProperty().multiply(0.6).divide(cols),
+                                                       scene.heightProperty().multiply(0.6).divide(rows)));
                 tile.heightProperty().bind(tile.widthProperty());
                 tile.setFill(Color.DARKGRAY);
 
