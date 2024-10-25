@@ -21,8 +21,7 @@ public class Layer {
         Random rand = new Random(); // Random generator for integer values
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < weights[i].length; j++) {
-                // Assign random integer weights in the range [-5, 5]
-                weights[i][j] = rand.nextInt(3) - 1; // Range -5 to 5
+                weights[i][j] = rand.nextInt(3) + 1; 
             }
             biases[i] = 1; // Set all biases to 1
         }
