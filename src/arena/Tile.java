@@ -22,11 +22,4 @@ public class Tile {
 	public void resetColor() {
 	    this.currentColor = defaultColor;  // Reset to default color
 	}
-
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }
