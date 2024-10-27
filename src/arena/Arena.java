@@ -3,6 +3,7 @@ package arena;
 import snake.SnakeLinkedList;
 import snake.SnakeNode;
 import snake.Direction;
+import snake.Position; // Ensure this class exists in the snake package
 import apple.Apple;
 
 import javafx.beans.binding.Bindings;
@@ -12,16 +13,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Represents the game arena for the Snake game. The arena is an 8x8 grid
  * where the snake moves, apples are placed, and the game logic is processed.
  */
 public class Arena {
-    private final int rows = 8;  // Number of rows in the arena grid
-    private final int cols = 8;  // Number of columns in the arena grid
+    private final int rows = 16;  // Number of rows in the arena grid
+    private final int cols = 16;  // Number of columns in the arena grid
     private final int totalCells = rows * cols;  // Total number of cells in the grid
     private final Map<String, Rectangle> tileMap = new HashMap<>();  // Stores grid tiles for easy access
     private GridPane grid;  // The grid structure for the game arena
@@ -37,8 +40,8 @@ public class Arena {
      */
     public Arena(Scene scene) {
         grid = new GridPane();
-        resetGame();  // Initialize the snake and apple when the game starts
         initializeGrid(scene);  // Create the grid based on the scene
+        resetGame();  // Initialize the snake and apple when the game starts
     }
 
     /**
@@ -60,8 +63,10 @@ public class Arena {
                 Rectangle tile = new Rectangle();
 
                 // Bind the tile size to the smaller dimension of the scene
-                tile.widthProperty().bind(Bindings.min(scene.widthProperty().multiply(0.6).divide(cols),
-                                                       scene.heightProperty().multiply(0.6).divide(rows)));
+                tile.widthProperty().bind(Bindings.min(
+                        scene.widthProperty().multiply(0.6).divide(cols),
+                        scene.heightProperty().multiply(0.6).divide(rows)
+                ));
                 tile.heightProperty().bind(tile.widthProperty());
                 tile.setFill(Color.DARKGRAY);
 
@@ -70,9 +75,6 @@ public class Arena {
                 grid.add(tile, c, r);
             }
         }
-
-        updateSnakeDisplay();  // Initial display of the snake
-        updateAppleDisplay();  // Initial display of the apple
     }
 
     /**
@@ -80,9 +82,7 @@ public class Arena {
      * Adds vision squares to represent the snake's field of vision around the head.
      *
      * The grid is first cleared, then the snake's body is displayed in green, the head in dark green,
-     * and vision squares are displayed in purple. If an apple is detected within the vision area, 
-     * the respective square is turned blue, and if a part of the snake's body is in the vision area, 
-     * it is turned yellow.
+     * and vision squares are displayed based on the vision data provided by the snake.
      */
     private void updateSnakeDisplay() {
         clearGrid();  // Reset the grid before updating
@@ -104,70 +104,89 @@ public class Arena {
             current = current.getNext();
         }
 
-        // Get the head node and current direction of the snake
-        SnakeNode headNode = snake.getHead();
-        Direction.Dir direction = snake.getCurrentDirection();
+        // Retrieve vision data from the snake
+        int[] visionData = snake.getVisionData();
+        if (visionData.length == 5) { // Ensure vision data has expected number of elements
+            // Define vision square offsets based on the snake's current direction
+            int[][] visionOffsets = getVisionOffsets(snake.getCurrentDirection());
 
-        // Define vision square offsets based on the snake's current direction
-        int[][] visionOffsets = new int[5][2];
+            // Apply the vision squares based on the contents
+            for (int i = 0; i < visionOffsets.length; i++) {
+                int visionY = snake.getHead().getY() + visionOffsets[i][0];
+                int visionX = snake.getHead().getX() + visionOffsets[i][1];
+                String visionPosition = visionY + "," + visionX;
+                Rectangle visionTile = tileMap.get(visionPosition);
+
+                if (visionTile != null) {
+                    switch (visionData[i]) {
+                        case 0:
+                            visionTile.setFill(Color.GRAY);  // Wall
+                            System.out.println("Wall in vision at: (" + visionX + "," + visionY + ")");
+                            break;
+                        case 1:
+                            visionTile.setFill(Color.YELLOW);  // Snake body
+                            break;
+                        case 2:
+                            visionTile.setFill(Color.PURPLE);  // Empty
+                            break;
+                        case 3:
+                            visionTile.setFill(Color.BLUE);  // Apple
+                            System.out.println("Apple in vision at: (" + visionX + "," + visionY + ")");
+                            break;
+                        default:
+                            visionTile.setFill(Color.PURPLE);  // Default to empty
+                            break;
+                    }
+                } else {
+                    // Vision tile is out of bounds, already handled in vision data
+                    System.out.println("Vision tile out of bounds at: (" + visionX + "," + visionY + ")");
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines the vision square offsets based on the current direction.
+     *
+     * @param direction The current direction of the snake
+     * @return A 2D array of offsets for the vision squares
+     */
+    private int[][] getVisionOffsets(Direction.Dir direction) {
         switch (direction) {
             case UP:
-                visionOffsets = new int[][]{
+                return new int[][]{
                     {-1, 0},  // Directly in front
                     {-1, -1}, // Left diagonal
                     {-1, 1},  // Right diagonal
                     {0, -1},  // Left side
                     {0, 1}    // Right side
                 };
-                break;
             case DOWN:
-                visionOffsets = new int[][]{
+                return new int[][]{
                     {1, 0},   // Directly in front
                     {1, -1},  // Left diagonal
                     {1, 1},   // Right diagonal
                     {0, -1},  // Left side
                     {0, 1}    // Right side
                 };
-                break;
             case LEFT:
-                visionOffsets = new int[][]{
+                return new int[][]{
                     {0, -1},  // Directly in front
                     {-1, -1}, // Left diagonal
                     {1, -1},  // Right diagonal
                     {-1, 0},  // Left side
                     {1, 0}    // Right side
                 };
-                break;
             case RIGHT:
-                visionOffsets = new int[][]{
+                return new int[][]{
                     {0, 1},   // Directly in front
                     {-1, 1},  // Left diagonal
                     {1, 1},   // Right diagonal
                     {-1, 0},  // Left side
                     {1, 0}    // Right side
                 };
-                break;
-        }
-
-        // Apply the vision squares based on the contents
-        for (int[] offset : visionOffsets) {
-            int visionY = headNode.getY() + offset[0];
-            int visionX = headNode.getX() + offset[1];
-            String visionPosition = visionY + "," + visionX;
-            Rectangle visionTile = tileMap.get(visionPosition);
-
-            if (visionTile != null) {
-                // Check if an apple is at the vision position
-                if (apple.getX() == visionX && apple.getY() == visionY) {
-                    visionTile.setFill(Color.BLUE);  // Color vision tile blue if it contains an apple
-                }
-                // Check if the snake's body is at the vision position
-                else if (isSnakeAtPosition(visionX, visionY)) {
-                    visionTile.setFill(Color.YELLOW);  // Color vision tile yellow if it contains part of the snake
-                } else {
-                    visionTile.setFill(Color.PURPLE);  // Default vision color if empty
-                }
-            }
+            default:
+                return new int[0][0]; // Fallback for undefined directions
         }
     }
 
@@ -255,8 +274,24 @@ public class Arena {
      * This method places the snake back at the center of the grid and generates a new apple.
      */
     public void resetGame() {
-        snake = new SnakeLinkedList(cols / 2, rows / 2);  // Reset the snake at the center
-        generateApple();  // Generate a new apple
+        // Example: Creating a snake with vision enabled
+        snake = new SnakeLinkedList(cols / 2, rows / 2, false);  // Set to 'true' to enable vision
+
+        // Generate a new apple
+        generateApple();
+
+        // Collect snake body positions (excluding head)
+        Set<Position> snakeBodyPositions = new HashSet<>();
+        SnakeNode current = snake.getHead().getNext(); // Exclude the head
+        while (current != null) {
+            snakeBodyPositions.add(new Position(current.getX(), current.getY()));
+            current = current.getNext();
+        }
+
+        // Initialize vision data with current snake state
+        snake.initializeVisionData(apple.getX(), apple.getY(), rows, cols, snakeBodyPositions);
+
+        // Update the grid display
         updateSnakeDisplay();
         updateAppleDisplay();
     }
@@ -268,17 +303,31 @@ public class Arena {
      * if the player has won by filling the entire arena with the snake.
      */
     public void update() {
-        snake.move();
+        // Gather snake body positions for vision update (excluding head)
+        Set<Position> snakeBodyPositions = new HashSet<>();
+        SnakeNode current = snake.getHead().getNext(); // Exclude the head
+        while (current != null) {
+            snakeBodyPositions.add(new Position(current.getX(), current.getY()));
+            current = current.getNext();
+        }
+
+        // Move the snake, passing necessary parameters for vision
+        snake.move(apple.getX(), apple.getY(), rows, cols, snakeBodyPositions);
+
         if (checkAppleCollision()) {
             snake.grow();
 
             // Check if the snake has filled the entire arena (win condition)
             if (snake.getLength() == totalCells) {
-                return;  // Trigger win condition or handle it externally
+                // Handle win condition (e.g., display a message, reset game, etc.)
+                System.out.println("Congratulations! You won!");
+                resetGame();
+                return;
             }
 
             generateApple();  // Generate a new apple if the player hasn't won yet
         }
+
         updateSnakeDisplay();
         updateAppleDisplay();
     }
