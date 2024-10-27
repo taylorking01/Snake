@@ -171,8 +171,6 @@ public class Arena {
         }
     }
 
-
-
     /**
      * Updates the visual display of the apple on the grid by coloring the grid cell occupied by the apple.
      *
