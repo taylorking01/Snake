@@ -6,6 +6,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 
+/**
+ * The Window class serves as the entry point and manages scene transitions between different pages.
+ */
 public class Window extends Application {
 
     private static Stage primaryStage;
@@ -31,12 +34,16 @@ public class Window extends Application {
         primaryStage.show();
     }
 
-    // Static method to change between different pages
+    /**
+     * Static method to change between different pages.
+     *
+     * @param pageName the name of the page to switch to (e.g., "mainmenu", "playpage", "classicmodepage")
+     */
     public static void changePage(String pageName) {
         BorderPane root = new BorderPane();  // New root layout
 
         Scene scene = primaryStage.getScene(); // Access current scene
-        
+
         switch (pageName.toLowerCase()) {
             case "mainmenu":
             default:
@@ -48,9 +55,10 @@ public class Window extends Application {
                 root.setCenter(playPage.getLayout());  // Load the play page layout
                 break;
             case "classicmodepage":
-                ClassicModePage classicModePage = new ClassicModePage(scene); // Pass scene to ClassicModePage
+                ClassicModePage classicModePage = new ClassicModePage(scene, 300); // Pass scene and game speed
                 root.setCenter(classicModePage.getLayout());
                 break;
+            // Add additional cases for other game modes like "hardmodepage" if needed
         }
 
         // Set background color
@@ -61,8 +69,12 @@ public class Window extends Application {
         scene.setRoot(root);
     }
 
-
-    // Static helper method to convert Color to hex string for CSS styling
+    /**
+     * Static helper method to convert Color to hex string for CSS styling.
+     *
+     * @param color the Color to convert
+     * @return the hex string representation of the color
+     */
     public static String toHex(Color color) {
         return String.format("#%02X%02X%02X",
             (int)(color.getRed() * 255),
@@ -70,10 +82,20 @@ public class Window extends Application {
             (int)(color.getBlue() * 255));
     }
 
+    /**
+     * Retrieves the primary stage.
+     *
+     * @return the primary Stage
+     */
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
 
+    /**
+     * The main method launches the JavaFX application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         launch(args);  // Launch the JavaFX application
     }
