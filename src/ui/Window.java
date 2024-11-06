@@ -55,7 +55,7 @@ public class Window extends Application {
                 root.setCenter(playPage.getLayout());  // Load the play page layout
                 break;
             case "classicmodepage":
-                ClassicModePage classicModePage = new ClassicModePage(scene, 300); // Pass scene and game speed
+                ClassicModePage classicModePage = new ClassicModePage(scene, 200); // Pass scene and game speed
                 root.setCenter(classicModePage.getLayout());
                 break;
             // Add additional cases for other game modes like "hardmodepage" if needed

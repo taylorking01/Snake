@@ -2,6 +2,8 @@ package ui;
 
 import arena.Arena;
 import arena.ClassicMode;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * The ClassicModePage class represents the UI for the Classic Mode of the Snake game.
@@ -20,11 +23,12 @@ public class ClassicModePage {
     private final Arena arena;                  // The game arena for rendering
     private final ClassicMode classicMode;      // The game logic handler
     private final Scene scene;                  // The JavaFX scene for handling user input
+    private Timeline countdownTimeline;         // Timeline for countdown
 
     /**
      * Constructs a ClassicModePage object.
      *
-     * @param scene the Scene instance for handling user input
+     * @param scene           the Scene instance for handling user input
      * @param gameSpeedMillis the speed of the game in milliseconds per tick
      */
     public ClassicModePage(Scene scene, int gameSpeedMillis) {
@@ -40,8 +44,8 @@ public class ClassicModePage {
         // Set up the UI components
         setupUI();
 
-        // Start the game
-        classicMode.startGame();
+        // Ensure the game does not start automatically
+        // classicMode.startGame(); // Removed to prevent automatic start
     }
 
     /**
@@ -56,29 +60,22 @@ public class ClassicModePage {
 
         // Bind arena grid size to 60% of the scene's size for dynamic resizing
         centerPane.maxWidthProperty().bind(Bindings.min(
-                scene.widthProperty().multiply(0.6), 
+                scene.widthProperty().multiply(0.6),
                 scene.heightProperty().multiply(0.6)
         ));
         centerPane.maxHeightProperty().bind(centerPane.maxWidthProperty());
 
-        // "Pause" button setup
-        Button pauseButton = new Button("Pause");
-        applyButtonStyles(pauseButton, 100);
+        // "Start Game" button setup
+        Button startButton = new Button("Start Game");
+        applyButtonStyles(startButton, 200);
 
-        // Define action for the "Pause" button
-        pauseButton.setOnAction(e -> {
-            toggleButtonEffect(pauseButton);
-            if (classicMode.isRunning()) {
-                classicMode.pauseGame();
-                pauseButton.setText("Resume");
-            } else {
-                classicMode.resumeGame();
-                pauseButton.setText("Pause");
-            }
+        // Define action for the "Start Game" button
+        startButton.setOnAction(e -> {
+            startCountdown(startButton);
         });
 
-        // Combine the arena and "Pause" button in a VBox to center them together
-        VBox centerBox = new VBox(20, centerPane, pauseButton); // 20px spacing
+        // Combine the arena and "Start Game" button in a VBox to center them together
+        VBox centerBox = new VBox(20, centerPane, startButton); // 20px spacing
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setPadding(new Insets(20, 0, 0, 0));
 
@@ -91,9 +88,18 @@ public class ClassicModePage {
 
         // Define action for the "Back" button to navigate to the main menu
         backButton.setOnAction(e -> {
-            toggleButtonEffect(backButton);
-            classicMode.stopGame("Game Stopped by User.");
-            Window.changePage("mainmenu");  // Navigate back to main menu
+            // Stop the countdown if it's running
+            if (countdownTimeline != null) {
+                countdownTimeline.stop();
+            }
+
+            // Stop the game if it's running
+            if (classicMode.isRunning()) {
+                classicMode.stopGame("Game Stopped by User.");
+            }
+
+            // Navigate back to main menu
+            Window.changePage("mainmenu");
         });
 
         // Position the "Back" button at the bottom left
@@ -104,10 +110,44 @@ public class ClassicModePage {
     }
 
     /**
+     * Starts the countdown for the game start.
+     *
+     * @param startButton the "Start Game" button to update during the countdown
+     */
+    private void startCountdown(Button startButton) {
+        // Disable the button to prevent multiple clicks
+        startButton.setDisable(true);
+
+        // Create a Timeline with specific KeyFrames for each countdown step
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> startButton.setText("3")),
+            new KeyFrame(Duration.seconds(2), e -> startButton.setText("2")),
+            new KeyFrame(Duration.seconds(3), e -> startButton.setText("1")),
+            new KeyFrame(Duration.seconds(4), e -> {
+                startButton.setText("Go!");
+                // Remove the start button and start the game
+                VBox centerBox = (VBox) layout.getCenter();
+                centerBox.getChildren().remove(startButton);
+
+                // Start the game
+                classicMode.startGame();
+            })
+        );
+
+        // Optionally, add an onFinished handler if you need to perform actions after the timeline ends
+        timeline.setOnFinished(e -> {
+            // Cleanup or additional actions can be performed here
+        });
+
+        timeline.play();
+        countdownTimeline = timeline; // Assign to the instance variable for control
+    }
+
+    /**
      * Applies consistent styles to buttons.
      *
      * @param button the Button to style
-     * @param width the preferred width of the button
+     * @param width  the preferred width of the button
      */
     private void applyButtonStyles(Button button, int width) {
         button.setPrefWidth(width);  // Set preferred width
@@ -117,17 +157,6 @@ public class ClassicModePage {
         button.setOnMouseEntered(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
         button.setOnMouseExited(e -> button.setStyle(StyleConfig.getBaseButtonStyle()));
         button.setOnMousePressed(e -> button.setStyle(StyleConfig.getClickButtonStyle()));
-        button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
-    }
-
-    /**
-     * Creates a toggle effect for visual feedback when buttons are clicked.
-     *
-     * @param button the Button to apply the effect to
-     */
-    private void toggleButtonEffect(Button button) {
-        button.setStyle(StyleConfig.getClickButtonStyle());
-        // Reset style to hover style shortly after click
         button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
     }
 
