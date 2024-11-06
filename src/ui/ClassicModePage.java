@@ -126,7 +126,6 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         // Position the "Back" button at the bottom left
         VBox backButtonBox = new VBox(backButton);
         backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align at bottom left
-        backButtonBox.setPadding(new Insets(10));
         layout.setBottom(backButtonBox);
 
         // Set the topBox in the top region of the layout
