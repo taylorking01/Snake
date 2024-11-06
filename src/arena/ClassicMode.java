@@ -11,6 +11,7 @@ import javafx.util.Duration;
 import snake.Direction;
 import snake.Position;
 import snake.SnakeNode;
+import ui.GameListener;
 
 import java.util.Set;
 
@@ -27,6 +28,7 @@ public class ClassicMode {
     private final int gameSpeedMillis;              // The speed of the game in milliseconds per tick
     private Timeline gameLoop;                      // The game loop timeline
     private boolean isRunning;                      // Indicates if the game is currently running
+    private final GameListener gameListener;        // Listener for game events
 
     /**
      * Constructs a ClassicMode object.
@@ -34,12 +36,14 @@ public class ClassicMode {
      * @param arena           the Arena instance for rendering the game grid
      * @param scene           the Scene instance for handling user input
      * @param gameSpeedMillis the speed of the game in milliseconds per tick
+     * @param listener        the GameListener to notify upon game events
      */
-    public ClassicMode(Arena arena, Scene scene, int gameSpeedMillis) {
+    public ClassicMode(Arena arena, Scene scene, int gameSpeedMillis, GameListener listener) {
         this.arena = arena;
         this.scene = scene;
         this.gameSpeedMillis = gameSpeedMillis;
         this.gameController = new GameController(arena);
+        this.gameListener = listener;
         setupInputHandling(scene);
         initializeGameLoop();
     }
@@ -60,10 +64,12 @@ public class ClassicMode {
         if (isRunning) return;
 
         isRunning = true;
+        System.out.println("Game Started.");
 
         // Initialize snake and apple
         gameController.initializeSnake();
         gameController.generateApple();
+        System.out.println("Snake and apple initialized.");
 
         // Update the arena display
         updateArenaDisplay();
@@ -73,7 +79,7 @@ public class ClassicMode {
     }
 
     /**
-     * Stops the classic mode game by stopping the game loop and displaying a message.
+     * Stops the classic mode game by stopping the game loop and notifying the listener.
      *
      * @param message the message to display upon game termination
      */
@@ -82,6 +88,12 @@ public class ClassicMode {
         gameLoop.stop();
         isRunning = false;
         System.out.println(message);
+
+        // Notify the listener that the game has ended
+        if (gameListener != null) {
+            gameListener.onGameOver(message);
+        }
+
         // Optionally, display a JavaFX Alert dialog with the message
     }
 
@@ -95,6 +107,7 @@ public class ClassicMode {
 
         // Move the snake based on the current direction
         gameController.moveSnake();
+        System.out.println("Snake moved.");
 
         // Check for collisions (walls or self)
         if (checkCollision()) {
@@ -108,6 +121,7 @@ public class ClassicMode {
         if (head.getX() == apple.getX() && head.getY() == apple.getY()) {
             gameController.growSnake(); // Grow the snake
             gameController.generateApple(); // Generate a new apple
+            System.out.println("Apple eaten. Snake grown.");
             updateArenaDisplay(); // Update display after eating apple
         } else {
             // Update the arena's visual representation only if apple wasn't eaten
@@ -178,6 +192,9 @@ public class ClassicMode {
                 appleTile.setFill(Color.RED);
             }
         }
+
+        // Debugging Output
+        System.out.println("Arena updated with snake and apple positions.");
     }
 
     /**

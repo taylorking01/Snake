@@ -18,7 +18,7 @@ import javafx.util.Duration;
  * The ClassicModePage class represents the UI for the Classic Mode of the Snake game.
  * It integrates the Arena for rendering and delegates game logic to the ClassicMode class.
  */
-public class ClassicModePage {
+public class ClassicModePage implements GameListener { // Implement GameListener
     private final BorderPane layout;            // The main layout pane
     private final Arena arena;                  // The game arena for rendering
     private final ClassicMode classicMode;      // The game logic handler
@@ -38,8 +38,8 @@ public class ClassicModePage {
         // Initialize the Arena with the scene
         this.arena = new Arena(scene);
 
-        // Initialize ClassicMode with the arena, scene, and game speed
-        this.classicMode = new ClassicMode(arena, scene, gameSpeedMillis);
+        // Initialize ClassicMode with the arena, scene, game speed, and GameListener
+        this.classicMode = new ClassicMode(arena, scene, gameSpeedMillis, this);
 
         // Set up the UI components
         setupUI();
@@ -71,7 +71,7 @@ public class ClassicModePage {
 
         // Define action for the "Start Game" button
         startButton.setOnAction(e -> {
-            startCountdown(startButton);
+            startCountdown(startButton, "Start Game");
         });
 
         // Combine the arena and "Start Game" button in a VBox to center them together
@@ -112,19 +112,23 @@ public class ClassicModePage {
     /**
      * Starts the countdown for the game start.
      *
-     * @param startButton the "Start Game" button to update during the countdown
+     * @param startButton the button to update during the countdown
+     * @param buttonText  the initial text of the button ("Start Game" or "Play Again")
      */
-    private void startCountdown(Button startButton) {
+    private void startCountdown(Button startButton, String buttonText) {
         // Disable the button to prevent multiple clicks
         startButton.setDisable(true);
+
+        // Reset button text
+        startButton.setText(buttonText);
 
         // Create a Timeline with specific KeyFrames for each countdown step
         Timeline timeline = new Timeline(
             new KeyFrame(Duration.seconds(1), e -> startButton.setText("3")),
             new KeyFrame(Duration.seconds(2), e -> startButton.setText("2")),
             new KeyFrame(Duration.seconds(3), e -> startButton.setText("1")),
-            new KeyFrame(Duration.seconds(4), e -> {
-                startButton.setText("Go!");
+            new KeyFrame(Duration.seconds(4), e -> startButton.setText("Go!")),
+            new KeyFrame(Duration.seconds(5), e -> {
                 // Remove the start button and start the game
                 VBox centerBox = (VBox) layout.getCenter();
                 centerBox.getChildren().remove(startButton);
@@ -137,6 +141,7 @@ public class ClassicModePage {
         // Optionally, add an onFinished handler if you need to perform actions after the timeline ends
         timeline.setOnFinished(e -> {
             // Cleanup or additional actions can be performed here
+            // This is already handled in the last KeyFrame
         });
 
         timeline.play();
@@ -167,5 +172,29 @@ public class ClassicModePage {
      */
     public BorderPane getLayout() {
         return layout;
+    }
+
+    /**
+     * Called when the game is over. Updates the UI to show the "Play Again" button.
+     *
+     * @param message the message associated with the game end
+     */
+    @Override
+    public void onGameOver(String message) {
+        // Show an alert or handle the game over message as needed
+        System.out.println("Game Over Message Received: " + message);
+
+        // Recreate the "Play Again" button
+        Button playAgainButton = new Button("Play Again");
+        applyButtonStyles(playAgainButton, 200);
+
+        // Define action for the "Play Again" button
+        playAgainButton.setOnAction(e -> {
+            startCountdown(playAgainButton, "Play Again");
+        });
+
+        // Add the "Play Again" button back to the center VBox
+        VBox centerBox = (VBox) layout.getCenter();
+        centerBox.getChildren().add(playAgainButton);
     }
 }
