@@ -29,6 +29,7 @@ public class ClassicMode {
     private Timeline gameLoop;                      // The game loop timeline
     private boolean isRunning;                      // Indicates if the game is currently running
     private final GameListener gameListener;        // Listener for game events
+    private int applesEaten;                        // Counter for apples eaten
 
     /**
      * Constructs a ClassicMode object.
@@ -44,6 +45,7 @@ public class ClassicMode {
         this.gameSpeedMillis = gameSpeedMillis;
         this.gameController = new GameController(arena);
         this.gameListener = listener;
+        this.applesEaten = 0;
         setupInputHandling(scene);
         initializeGameLoop();
     }
@@ -64,6 +66,7 @@ public class ClassicMode {
         if (isRunning) return;
 
         isRunning = true;
+        applesEaten = 0; // Reset apple counter when starting a new game
         System.out.println("Game Started.");
 
         // Initialize snake and apple
@@ -120,8 +123,10 @@ public class ClassicMode {
         Apple apple = gameController.getApple();
         if (head.getX() == apple.getX() && head.getY() == apple.getY()) {
             gameController.growSnake(); // Grow the snake
+            applesEaten++; // Increment apple counter
             gameController.generateApple(); // Generate a new apple
-            System.out.println("Apple eaten. Snake grown.");
+            System.out.println("Apple eaten. Snake grown. Total apples eaten: " + applesEaten);
+            gameListener.onAppleEaten(applesEaten); // Notify listener
             updateArenaDisplay(); // Update display after eating apple
         } else {
             // Update the arena's visual representation only if apple wasn't eaten

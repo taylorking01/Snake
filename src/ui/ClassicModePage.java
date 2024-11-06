@@ -4,14 +4,17 @@ import arena.Arena;
 import arena.ClassicMode;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
@@ -24,6 +27,13 @@ public class ClassicModePage implements GameListener { // Implement GameListener
     private final ClassicMode classicMode;      // The game logic handler
     private final Scene scene;                  // The JavaFX scene for handling user input
     private Timeline countdownTimeline;         // Timeline for countdown
+
+    // UI Components for Timer and Apple Counter
+    private Label timerLabel;                   // Label to display the timer
+    private Timeline timerTimeline;             // Timeline to update the timer
+    private int elapsedSeconds;                 // Counter for elapsed seconds
+
+    private Label appleCounterLabel;            // Label to display the apple count
 
     /**
      * Constructs a ClassicModePage object.
@@ -41,6 +51,9 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         // Initialize ClassicMode with the arena, scene, game speed, and GameListener
         this.classicMode = new ClassicMode(arena, scene, gameSpeedMillis, this);
 
+        // Initialize timer variables
+        this.elapsedSeconds = 0;
+
         // Set up the UI components
         setupUI();
 
@@ -52,6 +65,9 @@ public class ClassicModePage implements GameListener { // Implement GameListener
      * Sets up the UI components, including the game arena and control buttons.
      */
     private void setupUI() {
+        // Top section for Timer and Apple Counter
+        HBox topBox = createTopBox();
+
         // Center the arena grid with dynamic resizing
         StackPane centerPane = new StackPane();
         centerPane.setPadding(new Insets(10));
@@ -93,13 +109,18 @@ public class ClassicModePage implements GameListener { // Implement GameListener
                 countdownTimeline.stop();
             }
 
+            // Stop the timer if it's running
+            if (timerTimeline != null) {
+                timerTimeline.stop();
+            }
+
             // Stop the game if it's running
             if (classicMode.isRunning()) {
                 classicMode.stopGame("Game Stopped by User.");
             }
 
             // Navigate back to main menu
-            Window.changePage("mainmenu");
+            Window.changePage("playpage");
         });
 
         // Position the "Back" button at the bottom left
@@ -107,6 +128,38 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align at bottom left
         backButtonBox.setPadding(new Insets(10));
         layout.setBottom(backButtonBox);
+
+        // Set the topBox in the top region of the layout
+        layout.setTop(topBox);
+    }
+
+    /**
+     * Creates the top section of the UI containing the Timer and Apple Counter.
+     *
+     * @return an HBox containing the Timer and Apple Counter
+     */
+    private HBox createTopBox() {
+        // Timer Display
+        timerLabel = new Label("00:00");
+        timerLabel.setStyle("-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: black; -fx-padding: 5px;");
+        timerLabel.setMinWidth(60);
+        timerLabel.setAlignment(Pos.CENTER);
+
+        // Apple Counter Display
+        Rectangle appleIcon = new Rectangle(15, 15, Color.RED);
+        appleIcon.setStroke(Color.BLACK);
+        appleCounterLabel = new Label("0");
+        appleCounterLabel.setStyle("-fx-font-size: 16px;");
+
+        HBox appleCounterBox = new HBox(5, appleIcon, appleCounterLabel);
+        appleCounterBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Combine Timer and Apple Counter in an HBox
+        HBox topBox = new HBox(20, timerLabel, appleCounterBox);
+        topBox.setAlignment(Pos.CENTER_LEFT);
+        topBox.setPadding(new Insets(10, 10, 10, 10));
+
+        return topBox;
     }
 
     /**
@@ -133,19 +186,52 @@ public class ClassicModePage implements GameListener { // Implement GameListener
                 VBox centerBox = (VBox) layout.getCenter();
                 centerBox.getChildren().remove(startButton);
 
+                // Start the timer
+                startTimer();
+
                 // Start the game
                 classicMode.startGame();
             })
         );
 
-        // Optionally, add an onFinished handler if you need to perform actions after the timeline ends
-        timeline.setOnFinished(e -> {
-            // Cleanup or additional actions can be performed here
-            // This is already handled in the last KeyFrame
-        });
-
         timeline.play();
         countdownTimeline = timeline; // Assign to the instance variable for control
+    }
+
+    /**
+     * Starts the game timer.
+     */
+    private void startTimer() {
+        elapsedSeconds = 0;
+        timerLabel.setText(formatTime(elapsedSeconds));
+
+        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            elapsedSeconds++;
+            timerLabel.setText(formatTime(elapsedSeconds));
+        }));
+        timerTimeline.setCycleCount(Timeline.INDEFINITE);
+        timerTimeline.play();
+    }
+
+    /**
+     * Stops the game timer.
+     */
+    private void stopTimer() {
+        if (timerTimeline != null) {
+            timerTimeline.stop();
+        }
+    }
+
+    /**
+     * Formats the elapsed time in "MM:SS" format.
+     *
+     * @param totalSeconds the total elapsed seconds
+     * @return a formatted time string
+     */
+    private String formatTime(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     /**
@@ -181,20 +267,45 @@ public class ClassicModePage implements GameListener { // Implement GameListener
      */
     @Override
     public void onGameOver(String message) {
-        // Show an alert or handle the game over message as needed
-        System.out.println("Game Over Message Received: " + message);
+        Platform.runLater(() -> {
+            // Stop the timer
+            stopTimer();
 
-        // Recreate the "Play Again" button
-        Button playAgainButton = new Button("Play Again");
-        applyButtonStyles(playAgainButton, 200);
+            // Show an alert dialog with the game over message
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
 
-        // Define action for the "Play Again" button
-        playAgainButton.setOnAction(e -> {
-            startCountdown(playAgainButton, "Play Again");
+            // Recreate the "Play Again" button
+            Button playAgainButton = new Button("Play Again");
+            applyButtonStyles(playAgainButton, 200);
+
+            // Define action for the "Play Again" button
+            playAgainButton.setOnAction(e -> {
+                startCountdown(playAgainButton, "Play Again");
+            });
+
+            // Add the "Play Again" button back to the center VBox
+            VBox centerBox = (VBox) layout.getCenter();
+            centerBox.getChildren().add(playAgainButton);
+
+            // Reset timer and apple counter labels
+            timerLabel.setText("00:00");
+            appleCounterLabel.setText("0");
         });
+    }
 
-        // Add the "Play Again" button back to the center VBox
-        VBox centerBox = (VBox) layout.getCenter();
-        centerBox.getChildren().add(playAgainButton);
+    /**
+     * Called when an apple is eaten by the snake. Updates the apple counter.
+     *
+     * @param appleCount the total number of apples eaten so far
+     */
+    @Override
+    public void onAppleEaten(int appleCount) {
+        Platform.runLater(() -> {
+            appleCounterLabel.setText(String.valueOf(appleCount));
+        });
     }
 }
