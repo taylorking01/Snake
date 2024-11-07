@@ -104,7 +104,7 @@ public class ClassicModePage implements GameListener {
             if (countdownTimeline != null) countdownTimeline.stop();
             if (timerTimeline != null) timerTimeline.stop();
             if (classicMode.isRunning()) classicMode.stopGame("Game Stopped by User.");
-            Window.changePage("playpage");
+            Window.changePage("trainpage");
         });
 
         // Position the "Back" button at the bottom left
@@ -130,7 +130,7 @@ public class ClassicModePage implements GameListener {
         Rectangle appleIcon = new Rectangle(15, 15, Color.RED);
         appleIcon.setStroke(Color.BLACK);
         appleCounterLabel = new Label("0");
-        appleCounterLabel.setStyle("-fx-font-size: 16px;");
+        appleCounterLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
 
         HBox appleCounterBox = new HBox(5, appleIcon, appleCounterLabel);
         appleCounterBox.setAlignment(Pos.CENTER_LEFT);

@@ -15,7 +15,7 @@ public class TrainPage {
         
         //PRA Mode button
         Button PRAButton = new Button("Progressive Reinforcement Agent");
-        applyButtonStyles(PRAButton, 250);
+        applyButtonStyles(PRAButton, 400);
         
         // Define action for the button to navigate to the PRApage
         PRAButton.setOnAction(e -> {
