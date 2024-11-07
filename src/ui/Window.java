@@ -64,10 +64,10 @@ public class Window extends Application {
             	TrainPage trainPage = new TrainPage();
                 root.setCenter(trainPage.getLayout());  // Load the train page layout
                 break;
-            case "PRApage":
-            	PRAPage praPage = new PRAPage();
-            	root.setCenter(trainPage.getLayout());
-            	break;
+            //case "PRApage":
+            //	PRAPage praPage = new PRAPage();
+            //	root.setCenter(trainPage.getLayout());
+            //	break;
             //Add additional cases for other modes if needed.
         }
 

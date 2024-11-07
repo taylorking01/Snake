@@ -174,12 +174,17 @@ public class ClassicModePage implements GameListener {
      * Starts the game timer.
      */
     private void startTimer() {
-        elapsedSeconds = 0;
+        elapsedSeconds = 60;  // Set initial countdown time to 1 minute (60 seconds)
         timerLabel.setText(formatTime(elapsedSeconds));
 
         timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            elapsedSeconds++;
+            elapsedSeconds--;
             timerLabel.setText(formatTime(elapsedSeconds));
+
+            if (elapsedSeconds <= 0) {
+                stopTimer();
+                classicMode.stopGame("Time's up! Game Over.");
+            }
         }));
         timerTimeline.setCycleCount(Timeline.INDEFINITE);
         timerTimeline.play();
