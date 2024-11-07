@@ -33,6 +33,7 @@ public class SnakeLinkedList {
         direction = new Direction(Direction.Dir.RIGHT);  // Initialize moving to the right
         length = 1;  // Initial length of the snake
         this.hasVision = hasVision;
+        
 
         if (hasVision) {
             initializeVision();

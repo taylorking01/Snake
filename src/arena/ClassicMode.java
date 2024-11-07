@@ -70,7 +70,7 @@ public class ClassicMode {
         System.out.println("Game Started.");
 
         // Initialize snake and apple
-        gameController.initializeSnake();
+        gameController.initializeSnake(false);
         gameController.generateApple();
         System.out.println("Snake and apple initialized.");
 

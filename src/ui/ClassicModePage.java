@@ -104,7 +104,7 @@ public class ClassicModePage implements GameListener {
             if (countdownTimeline != null) countdownTimeline.stop();
             if (timerTimeline != null) timerTimeline.stop();
             if (classicMode.isRunning()) classicMode.stopGame("Game Stopped by User.");
-            Window.changePage("trainpage");
+            Window.changePage("playpage");
         });
 
         // Position the "Back" button at the bottom left

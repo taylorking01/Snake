@@ -38,10 +38,10 @@ public class GameController {
     /**
      * Initializes the snake at the center of the arena.
      */
-    public void initializeSnake() {
+    public void initializeSnake(boolean hasVision) {
         int startX = arena.getCols() / 2;
         int startY = arena.getRows() / 2;
-        snake = new SnakeLinkedList(startX, startY, false); // 'false' indicates vision is disabled
+        snake = new SnakeLinkedList(startX, startY, hasVision); // 'false' indicates vision is disabled
     }
 
     /**
@@ -195,5 +195,33 @@ public class GameController {
                (newDir == Direction.Dir.DOWN && currentDir == Direction.Dir.UP) ||
                (newDir == Direction.Dir.LEFT && currentDir == Direction.Dir.RIGHT) ||
                (newDir == Direction.Dir.RIGHT && currentDir == Direction.Dir.LEFT);
+    }
+
+    public boolean checkSelfCollision() {
+        if (snake == null) {
+            throw new IllegalStateException("Snake has not been initialized.");
+        }
+
+        SnakeNode head = snake.getHead();
+        int headX = head.getX();
+        int headY = head.getY();
+
+        SnakeNode current = head.getNext(); // Start checking from the node after the head
+        while (current != null) {
+            if (current.getX() == headX && current.getY() == headY) {
+                return true; // Collision detected
+            }
+            current = current.getNext();
+        }
+
+        return false; // No collision
+    }
+    
+    // In GameController.java
+    public int[] getVisionData() {
+        if (snake != null) {
+            return snake.getVisionData();
+        }
+        return new int[0]; // Return an empty array if the snake is not initialized
     }
 }

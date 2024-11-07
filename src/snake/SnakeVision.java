@@ -16,7 +16,7 @@ public class SnakeVision {
      */
     public SnakeVision() {
         this.visionArray = new int[5];  // Representing 5 surrounding squares
-        this.showVision = false;  // Default to hidden
+        this.showVision = true;  // Default to hidden
     }
 
     /**
