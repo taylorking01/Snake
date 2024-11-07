@@ -19,6 +19,18 @@ public class StyleConfig {
                "-fx-border-radius: 0;" +
                "-fx-background-radius: 0;";
     }
+    
+    public static String getButtonNonVisibleStyle() {
+    	return "-fx-background-color: " + BACKGROUND_COLOR + ";" +
+                "-fx-text-fill: " + BACKGROUND_COLOR + ";" +
+                "-fx-font-family: 'Courier New';" +
+                "-fx-font-size: 16px;" +
+                "-fx-padding: 10px 20px;" +
+                "-fx-border-color: " + BACKGROUND_COLOR + ";" +
+                "-fx-border-width: 3px;" +
+                "-fx-border-radius: 0;" +
+                "-fx-background-radius: 0;";  
+    }
 
     public static String getHoverButtonStyle() {
         return getBaseButtonStyle() + "-fx-border-width: 2px;";

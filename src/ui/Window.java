@@ -50,6 +50,7 @@ public class Window extends Application {
                 MainMenu mainMenu = new MainMenu();
                 root.setCenter(mainMenu.getLayout());  // Load the main menu layout
                 break;
+            //PLAY MODE
             case "playpage":
                 PlayPage playPage = new PlayPage();
                 root.setCenter(playPage.getLayout());  // Load the play page layout
@@ -58,7 +59,13 @@ public class Window extends Application {
                 ClassicModePage classicModePage = new ClassicModePage(scene, 200); // Pass scene and game speed
                 root.setCenter(classicModePage.getLayout());
                 break;
-            // Add additional cases for other game modes like "hardmodepage" if needed
+            //TRAIN MODE
+            case "trainpage":
+            	TrainPage trainPage = new TrainPage();
+                root.setCenter(trainPage.getLayout());  // Load the train page layout
+                break;
+            
+            // Add additional cases for other modes if needed
         }
 
         // Set background color

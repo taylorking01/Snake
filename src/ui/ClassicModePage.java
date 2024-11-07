@@ -21,19 +21,19 @@ import javafx.util.Duration;
  * The ClassicModePage class represents the UI for the Classic Mode of the Snake game.
  * It integrates the Arena for rendering and delegates game logic to the ClassicMode class.
  */
-public class ClassicModePage implements GameListener { // Implement GameListener
+public class ClassicModePage implements GameListener {
     private final BorderPane layout;            // The main layout pane
     private final Arena arena;                  // The game arena for rendering
     private final ClassicMode classicMode;      // The game logic handler
     private final Scene scene;                  // The JavaFX scene for handling user input
     private Timeline countdownTimeline;         // Timeline for countdown
 
-    // UI Components for Timer and Apple Counter
+    // UI Components for Timer, Apple Counter, and Start Button
     private Label timerLabel;                   // Label to display the timer
     private Timeline timerTimeline;             // Timeline to update the timer
     private int elapsedSeconds;                 // Counter for elapsed seconds
-
     private Label appleCounterLabel;            // Label to display the apple count
+    private Button startButton;                 // Single instance of start button
 
     /**
      * Constructs a ClassicModePage object.
@@ -54,11 +54,8 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         // Initialize timer variables
         this.elapsedSeconds = 0;
 
-        // Set up the UI components
+        // Initialize and set up the UI components
         setupUI();
-
-        // Ensure the game does not start automatically
-        // classicMode.startGame(); // Removed to prevent automatic start
     }
 
     /**
@@ -81,13 +78,13 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         ));
         centerPane.maxHeightProperty().bind(centerPane.maxWidthProperty());
 
-        // "Start Game" button setup
-        Button startButton = new Button("Start Game");
+        // Initialize the single instance of the "Start Game" button
+        startButton = new Button("Start Game");
         applyButtonStyles(startButton, 200);
 
         // Define action for the "Start Game" button
         startButton.setOnAction(e -> {
-            startCountdown(startButton, "Start Game");
+            startCountdown("Start Game");
         });
 
         // Combine the arena and "Start Game" button in a VBox to center them together
@@ -104,28 +101,15 @@ public class ClassicModePage implements GameListener { // Implement GameListener
 
         // Define action for the "Back" button to navigate to the main menu
         backButton.setOnAction(e -> {
-            // Stop the countdown if it's running
-            if (countdownTimeline != null) {
-                countdownTimeline.stop();
-            }
-
-            // Stop the timer if it's running
-            if (timerTimeline != null) {
-                timerTimeline.stop();
-            }
-
-            // Stop the game if it's running
-            if (classicMode.isRunning()) {
-                classicMode.stopGame("Game Stopped by User.");
-            }
-
-            // Navigate back to main menu
+            if (countdownTimeline != null) countdownTimeline.stop();
+            if (timerTimeline != null) timerTimeline.stop();
+            if (classicMode.isRunning()) classicMode.stopGame("Game Stopped by User.");
             Window.changePage("playpage");
         });
 
         // Position the "Back" button at the bottom left
         VBox backButtonBox = new VBox(backButton);
-        backButtonBox.setAlignment(Pos.BOTTOM_LEFT);  // Align at bottom left
+        backButtonBox.setAlignment(Pos.BOTTOM_LEFT);
         layout.setBottom(backButtonBox);
 
         // Set the topBox in the top region of the layout
@@ -138,13 +122,11 @@ public class ClassicModePage implements GameListener { // Implement GameListener
      * @return an HBox containing the Timer and Apple Counter
      */
     private HBox createTopBox() {
-        // Timer Display
         timerLabel = new Label("00:00");
         timerLabel.setStyle("-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: black; -fx-padding: 5px;");
         timerLabel.setMinWidth(60);
         timerLabel.setAlignment(Pos.CENTER);
 
-        // Apple Counter Display
         Rectangle appleIcon = new Rectangle(15, 15, Color.RED);
         appleIcon.setStroke(Color.BLACK);
         appleCounterLabel = new Label("0");
@@ -153,7 +135,6 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         HBox appleCounterBox = new HBox(5, appleIcon, appleCounterLabel);
         appleCounterBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Combine Timer and Apple Counter in an HBox
         HBox topBox = new HBox(20, timerLabel, appleCounterBox);
         topBox.setAlignment(Pos.CENTER_LEFT);
         topBox.setPadding(new Insets(10, 10, 10, 10));
@@ -164,37 +145,29 @@ public class ClassicModePage implements GameListener { // Implement GameListener
     /**
      * Starts the countdown for the game start.
      *
-     * @param startButton the button to update during the countdown
      * @param buttonText  the initial text of the button ("Start Game" or "Play Again")
      */
-    private void startCountdown(Button startButton, String buttonText) {
-        // Disable the button to prevent multiple clicks
+    private void startCountdown(String buttonText) {
         startButton.setDisable(true);
-
-        // Reset button text
+        startButton.setVisible(true);
         startButton.setText(buttonText);
+        timerLabel.setText(formatTime(0));
+        appleCounterLabel.setText("0");
 
-        // Create a Timeline with specific KeyFrames for each countdown step
         Timeline timeline = new Timeline(
             new KeyFrame(Duration.seconds(1), e -> startButton.setText("3")),
             new KeyFrame(Duration.seconds(2), e -> startButton.setText("2")),
             new KeyFrame(Duration.seconds(3), e -> startButton.setText("1")),
             new KeyFrame(Duration.seconds(4), e -> startButton.setText("Go!")),
             new KeyFrame(Duration.seconds(5), e -> {
-                // Remove the start button and start the game
-                VBox centerBox = (VBox) layout.getCenter();
-                centerBox.getChildren().remove(startButton);
-
-                // Start the timer
+                startButton.setVisible(false);  // Hide button after countdown
                 startTimer();
-
-                // Start the game
                 classicMode.startGame();
             })
         );
 
         timeline.play();
-        countdownTimeline = timeline; // Assign to the instance variable for control
+        countdownTimeline = timeline;
     }
 
     /**
@@ -240,23 +213,12 @@ public class ClassicModePage implements GameListener { // Implement GameListener
      * @param width  the preferred width of the button
      */
     private void applyButtonStyles(Button button, int width) {
-        button.setPrefWidth(width);  // Set preferred width
+        button.setPrefWidth(width);  
         button.setStyle(StyleConfig.getBaseButtonStyle());
-
-        // Add hover and click effects
         button.setOnMouseEntered(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
         button.setOnMouseExited(e -> button.setStyle(StyleConfig.getBaseButtonStyle()));
         button.setOnMousePressed(e -> button.setStyle(StyleConfig.getClickButtonStyle()));
         button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
-    }
-
-    /**
-     * Retrieves the layout pane for this page.
-     *
-     * @return the BorderPane layout
-     */
-    public BorderPane getLayout() {
-        return layout;
     }
 
     /**
@@ -267,32 +229,17 @@ public class ClassicModePage implements GameListener { // Implement GameListener
     @Override
     public void onGameOver(String message) {
         Platform.runLater(() -> {
-            // Stop the timer
             stopTimer();
 
-            // Show an alert dialog with the game over message
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Over");
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
 
-            // Recreate the "Play Again" button
-            Button playAgainButton = new Button("Play Again");
-            applyButtonStyles(playAgainButton, 200);
-
-            // Define action for the "Play Again" button
-            playAgainButton.setOnAction(e -> {
-                startCountdown(playAgainButton, "Play Again");
-            });
-
-            // Add the "Play Again" button back to the center VBox
-            VBox centerBox = (VBox) layout.getCenter();
-            centerBox.getChildren().add(playAgainButton);
-
-            // Reset timer and apple counter labels
-            timerLabel.setText("00:00");
-            appleCounterLabel.setText("0");
+            startButton.setText("Play Again");
+            startButton.setDisable(false);
+            startButton.setVisible(true);
         });
     }
 
@@ -306,5 +253,14 @@ public class ClassicModePage implements GameListener { // Implement GameListener
         Platform.runLater(() -> {
             appleCounterLabel.setText(String.valueOf(appleCount));
         });
+    }
+
+    /**
+     * Retrieves the layout pane for this page.
+     *
+     * @return the BorderPane layout
+     */
+    public BorderPane getLayout() {
+        return layout;
     }
 }

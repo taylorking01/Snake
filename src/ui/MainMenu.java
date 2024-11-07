@@ -47,6 +47,12 @@ public class MainMenu {
         	toggleButtonEffect(playButton);
             Window.changePage("playpage");
         });
+        
+        // Define actions for the train button click
+        trainButton.setOnAction(e -> {
+        	toggleButtonEffect(trainButton);
+        	Window.changePage("trainpage");
+        });
 
         // Arrange elements in layout
         layout = new VBox(20);
