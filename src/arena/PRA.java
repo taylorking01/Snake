@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import snake.Direction;
+import snake.Direction.Dir;
 import snake.SnakeNode;
 import ui.GameListener;
 import ui.PRAPage;
@@ -161,6 +162,16 @@ public class PRA implements GameListener {
      */
     private void gameLoopTick() {
         if (!isRunning || isPaused) return;
+        
+        int[] a = gameController.getVisionData();
+        for (int i = 0; i < a.length; i++) {
+        	System.out.print(a[i]);
+        }
+        System.out.println("Above");
+        
+        gameController.changeDirection(Dir.DOWN); //Whatever direction returned by neural network
+        
+        gameController.moveSnake();
 
         
 
