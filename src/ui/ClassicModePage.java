@@ -2,8 +2,7 @@ package ui;
 
 import arena.Arena;
 import arena.ClassicMode;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import controller.Timer;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -15,7 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 /**
  * The ClassicModePage class represents the UI for the Classic Mode of the Snake game.
@@ -26,14 +24,14 @@ public class ClassicModePage implements GameListener {
     private final Arena arena;                  // The game arena for rendering
     private final ClassicMode classicMode;      // The game logic handler
     private final Scene scene;                  // The JavaFX scene for handling user input
-    private Timeline countdownTimeline;         // Timeline for countdown
 
     // UI Components for Timer, Apple Counter, and Start Button
     private Label timerLabel;                   // Label to display the timer
-    private Timeline timerTimeline;             // Timeline to update the timer
-    private int elapsedSeconds;                 // Counter for elapsed seconds
     private Label appleCounterLabel;            // Label to display the apple count
     private Button startButton;                 // Single instance of start button
+
+    // New Timer Instance
+    private Timer gameTimer;
 
     /**
      * Constructs a ClassicModePage object.
@@ -51,8 +49,10 @@ public class ClassicModePage implements GameListener {
         // Initialize ClassicMode with the arena, scene, game speed, and GameListener
         this.classicMode = new ClassicMode(arena, scene, gameSpeedMillis, this);
 
-        // Initialize timer variables
-        this.elapsedSeconds = 0;
+        // Initialize the Timer for a 60-second countdown
+        this.gameTimer = new Timer(60, 0); // Count down from 60 to 0
+        this.gameTimer.addTimeUpdateListener(this::updateTimerLabel);
+        this.gameTimer.addTimerCompleteListener(this::onTimerComplete);
 
         // Initialize and set up the UI components
         setupUI();
@@ -101,8 +101,7 @@ public class ClassicModePage implements GameListener {
 
         // Define action for the "Back" button to navigate to the main menu
         backButton.setOnAction(e -> {
-            if (countdownTimeline != null) countdownTimeline.stop();
-            if (timerTimeline != null) timerTimeline.stop();
+            if (gameTimer != null) gameTimer.stop();
             if (classicMode.isRunning()) classicMode.stopGame("Game Stopped by User.");
             Window.changePage("playpage");
         });
@@ -122,7 +121,7 @@ public class ClassicModePage implements GameListener {
      * @return an HBox containing the Timer and Apple Counter
      */
     private HBox createTopBox() {
-        timerLabel = new Label("00:00");
+        timerLabel = new Label("01:00"); // Initialize with 60 seconds
         timerLabel.setStyle("-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: black; -fx-padding: 5px;");
         timerLabel.setMinWidth(60);
         timerLabel.setAlignment(Pos.CENTER);
@@ -145,70 +144,37 @@ public class ClassicModePage implements GameListener {
     /**
      * Starts the countdown for the game start.
      *
-     * @param buttonText  the initial text of the button ("Start Game" or "Play Again")
+     * @param buttonText the initial text of the button ("Start Game" or "Play Again")
      */
     private void startCountdown(String buttonText) {
         startButton.setDisable(true);
         startButton.setVisible(true);
         startButton.setText(buttonText);
-        timerLabel.setText(formatTime(0));
         appleCounterLabel.setText("0");
 
-        Timeline timeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), e -> startButton.setText("3")),
-            new KeyFrame(Duration.seconds(2), e -> startButton.setText("2")),
-            new KeyFrame(Duration.seconds(3), e -> startButton.setText("1")),
-            new KeyFrame(Duration.seconds(4), e -> startButton.setText("Go!")),
-            new KeyFrame(Duration.seconds(5), e -> {
+        Timer countdownTimer = new Timer(5, 0); // 5-second countdown
+        countdownTimer.addTimeUpdateListener(seconds -> {
+            Platform.runLater(() -> startButton.setText(String.valueOf(seconds)));
+        });
+        countdownTimer.addTimerCompleteListener(() -> {
+            Platform.runLater(() -> {
                 startButton.setVisible(false);  // Hide button after countdown
-                startTimer();
+                gameTimer.reset();
+                gameTimer.start();
                 classicMode.startGame();
-            })
-        );
-
-        timeline.play();
-        countdownTimeline = timeline;
-    }
-
-    /**
-     * Starts the game timer.
-     */
-    private void startTimer() {
-        elapsedSeconds = 60;  // Set initial countdown time to 1 minute (60 seconds)
-        timerLabel.setText(formatTime(elapsedSeconds));
-
-        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            elapsedSeconds--;
-            timerLabel.setText(formatTime(elapsedSeconds));
-
-            if (elapsedSeconds <= 0) {
-                stopTimer();
-                classicMode.stopGame("Time's up! Game Over.");
-            }
-        }));
-        timerTimeline.setCycleCount(Timeline.INDEFINITE);
-        timerTimeline.play();
-    }
-
-    /**
-     * Stops the game timer.
-     */
-    private void stopTimer() {
-        if (timerTimeline != null) {
-            timerTimeline.stop();
-        }
+            });
+        });
+        countdownTimer.start();
     }
 
     /**
      * Formats the elapsed time in "MM:SS" format.
      *
-     * @param totalSeconds the total elapsed seconds
+     * @param seconds the total elapsed seconds
      * @return a formatted time string
      */
-    private String formatTime(int totalSeconds) {
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%02d:%02d", minutes, seconds);
+    private String formatTimeForCountdown(int seconds) {
+        return String.format("%d", seconds);
     }
 
     /**
@@ -234,7 +200,7 @@ public class ClassicModePage implements GameListener {
     @Override
     public void onGameOver(String message) {
         Platform.runLater(() -> {
-            stopTimer();
+            gameTimer.stop();
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Over");
@@ -257,6 +223,24 @@ public class ClassicModePage implements GameListener {
     public void onAppleEaten(int appleCount) {
         Platform.runLater(() -> {
             appleCounterLabel.setText(String.valueOf(appleCount));
+        });
+    }
+
+    /**
+     * Updates the timer label based on the Timer's formatted time.
+     *
+     * @param formattedTime the formatted time string from the Timer
+     */
+    private void updateTimerLabel(String formattedTime) {
+        Platform.runLater(() -> timerLabel.setText(formattedTime));
+    }
+    
+    /**
+     * In the event the timer is complete.
+     */
+    private void onTimerComplete() {
+        Platform.runLater(() -> {
+            classicMode.stopGame("Time's up! Game Over.");
         });
     }
 
