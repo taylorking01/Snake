@@ -235,11 +235,11 @@ public class PRA implements GameListener {
 
         // Notify the listener (PRAPage) about the game over
         Platform.runLater(() -> {
-            praPage.showGameOverAlert(message);
+            //praPage.showGameOverAlert(message);
         });
 
         // Use PauseTransition for non-blocking delay before respawning
-        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        PauseTransition pause = new PauseTransition(Duration.seconds(0));
         pause.setOnFinished(event -> respawnSnake());
         pause.play();
     }
@@ -250,9 +250,13 @@ public class PRA implements GameListener {
      */
     private void respawnSnake() {
         try {
-            initializeGame();
+            gameController.resetSnake();         // Reset snake position and length without creating a new brain
+            gameController.generateApple();       // Place a new apple
+            applesEaten = 0;                      // Reset apple counter for the new round
+            updateArenaDisplay();                 // Update display to reflect new positions
+
             if (!isPaused) {
-                gameLoop.play();
+                gameLoop.play();                  // Resume the game loop if not paused
                 isRunning = true;
                 praPage.updateTrainButton("Halt Training");
                 System.out.println("Snake respawned and training resumed.");
@@ -261,6 +265,7 @@ public class PRA implements GameListener {
             handleException("Error respawning snake: " + e.getMessage());
         }
     }
+
 
     /**
      * Handles actions when an apple is eaten.

@@ -50,6 +50,28 @@ public class SnakeLinkedList {
     private void initializeVision() {
         vision = new SnakeVision(); 
     }
+    
+    /**
+     * Used to reset the position of a snake, without creating a new brain
+     * @param startX
+     * @param startY
+     * @param initialDirection
+     */
+    public void reset(int startX, int startY, Direction.Dir initialDirection, int gridRows, int gridCols, int appleX, int appleY, Set<Position> snakeBodyPositions) {
+        // Set head to the new starting position
+        this.head = new SnakeNode(startX, startY);
+        this.tail = this.head;         // Reset tail to head (single segment)
+        this.direction = new Direction(initialDirection); // Set initial direction
+        this.length = 1;               // Reset length to 1
+        this.shouldGrow = false;       // Reset grow flag
+
+        // Reinitialize vision if it was enabled
+        if (this.hasVision && this.vision != null) {
+            this.vision.updateVisionData(head, direction, gridRows, gridCols, appleX, appleY, snakeBodyPositions);
+        }
+    }
+
+
 
     /**
      * Removes the tail of the snake to simulate movement by shrinking the snake's body.

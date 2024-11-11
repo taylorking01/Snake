@@ -46,6 +46,24 @@ public class GameController {
         int startY = arena.getRows() / 2;
         snake = new SnakeLinkedList(startX, startY, hasVision); // 'false' indicates vision is disabled
     }
+    
+    /**
+     * Reset the snake
+     */
+    public void resetSnake() {
+        if (snake != null) {
+            int startX = arena.getCols() / 2;
+            int startY = arena.getRows() / 2;
+            int gridRows = arena.getRows();
+            int gridCols = arena.getCols();
+            int appleX = apple.getX();
+            int appleY = apple.getY();
+            Set<Position> snakeBodyPositions = getSnakeBodyPositions();
+            
+            snake.reset(startX, startY, Direction.Dir.RIGHT, gridRows, gridCols, appleX, appleY, snakeBodyPositions); // Reset snake position and length
+        }
+    }
+
 
     /**
      * Generates a new apple at a random position not occupied by the snake.

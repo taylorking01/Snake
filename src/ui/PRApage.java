@@ -28,7 +28,7 @@ public class PRAPage implements GameListener {
      *
      * @param scene the Scene instance for handling user input
      */
-    public PRAPage(Scene scene) {
+    public PRAPage(Scene scene, int gameSpeedMillis) {
         this.layout = new BorderPane();
         this.scene = scene;
 
@@ -39,7 +39,7 @@ public class PRAPage implements GameListener {
         setupUI();
 
         // Initialize the PRA instance
-        this.pra = new PRA(arena, scene, 200, this); // 200ms per tick as an example
+        this.pra = new PRA(arena, scene, gameSpeedMillis, this); // 200ms per tick as an example
     }
 
     /**

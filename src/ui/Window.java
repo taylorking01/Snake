@@ -65,7 +65,7 @@ public class Window extends Application {
                 root.setCenter(trainPage.getLayout());  // Load the train page layout
                 break;
             case "prapage":
-            	PRAPage praPage = new PRAPage(scene);
+            	PRAPage praPage = new PRAPage(scene, 500);
             	root.setCenter(praPage.getLayout());
             	break;
             //Add additional cases for other modes if needed.
