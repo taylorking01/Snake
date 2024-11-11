@@ -169,10 +169,13 @@ public class PRA implements GameListener {
         }
         System.out.println("Above");
         
-        gameController.changeDirection(Dir.DOWN); //Whatever direction returned by neural network
+        gameController.thinkNextMove();
+        
+        gameController.changeDirection(snakeDirection); //Whatever direction returned by neural network
         
         gameController.moveSnake();
 
+        
         
 
         // Check for collisions

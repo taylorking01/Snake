@@ -117,7 +117,7 @@ public class SnakeVision {
     /**
      * Retrieves the vision data array representing surroundings.
      *
-     * @return int[] Array indicating wall (0), snake body (1), empty (2), or apple (3)
+     * @return int[] Array indicating wall (-10), snake body (-3), empty (5), or apple (10)
      */
     public int[] getVisionArray() {
         return visionArray;

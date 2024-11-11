@@ -4,6 +4,7 @@ import arena.Arena;
 import apple.Apple;
 import snake.Direction;
 import snake.Position;
+import snake.SnakeBrain;
 import snake.SnakeLinkedList;
 import snake.SnakeNode;
 
@@ -22,7 +23,8 @@ public class GameController {
     private SnakeLinkedList snake;            // The snake object
     private Apple apple;                      // The current apple in the game
     private final Queue<Direction.Dir> directionQueue; // Queue to hold direction changes
-
+    private SnakeBrain snakeBrain; 			  //Neural net for move calculation
+    
     /**
      * Constructs a GameController object that manages the Snake game objects.
      *
@@ -33,6 +35,7 @@ public class GameController {
         this.snake = null;
         this.apple = null;
         this.directionQueue = new LinkedList<>();
+        this.snakeBrain = new SnakeBrain(); // Initialize SnakeBrain for neural network decisions
     }
 
     /**
@@ -224,4 +227,52 @@ public class GameController {
         }
         return new int[0]; // Return an empty array if the snake is not initialized
     }
+    
+    /**
+     * Uses the SnakeBrain neural network to decide the next move for the snake based on vision data.
+     */
+    public void thinkNextMove() {
+        if (snake == null) {
+            throw new IllegalStateException("Snake has not been initialized.");
+        }
+
+        // Retrieve vision data from the snake
+        double[] visionData = convertVisionData(snake.getVisionData());
+
+        // Get the decision index from the neural network
+        int decisionIndex = snakeBrain.decideNextMove(visionData);
+
+        // Map the decision index to a direction and change direction
+        Direction.Dir newDirection = mapDecisionToDirection(decisionIndex);
+        changeDirection(newDirection);
+    }
+
+    /**
+     * Helper method to convert vision data to neural network-friendly format.
+     */
+    private double[] convertVisionData(int[] visionData) {
+        double[] inputData = new double[visionData.length];
+        for (int i = 0; i < visionData.length; i++) {
+            inputData[i] = visionData[i];
+        }
+        return inputData;
+    }
+
+    /**
+     * Maps the neural network decision index to a Direction.Dir enum.
+     */
+    private Direction.Dir mapDecisionToDirection(int decisionIndex) {
+        switch (decisionIndex) {
+            case 0:
+                return Direction.Dir.UP;
+            case 1:
+                return Direction.Dir.LEFT;
+            case 2:
+                return Direction.Dir.RIGHT;
+            default:
+                return snake.getCurrentDirection(); // Default to current direction if index is unexpected
+        }
+    }
+
+    
 }
