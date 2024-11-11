@@ -32,7 +32,7 @@ public class SnakeVision {
      */
     public void updateVisionData(SnakeNode head, Direction direction, int gridRows, int gridCols, int appleX, int appleY, Set<Position> snakeBodyPositions) {
         // Reset vision array
-        Arrays.fill(visionArray, 2);  // Default all vision squares to "empty" (2)
+        Arrays.fill(visionArray, 5);  // Default all vision squares to "empty" (5)
 
         // Define vision square offsets based on the current direction
         int[][] visionOffsets = determineVisionOffsets(direction);
@@ -48,19 +48,19 @@ public class SnakeVision {
 
             if (visionY < 0 || visionY >= gridRows || visionX < 0 || visionX >= gridCols) {
                 // Mark as wall if out of bounds
-                visionArray[i] = 0;
+                visionArray[i] = -10;
                 System.out.println("Detected Wall at: (" + visionX + "," + visionY + ")");
             } else if (visionX == appleX && visionY == appleY) {
                 // Mark as apple if it matches apple coordinates
-                visionArray[i] = 3;
+                visionArray[i] = 10;
                 System.out.println("Detected Apple at: (" + visionX + "," + visionY + ")");
             } else if (snakeBodyPositions.contains(visionPos)) {
                 // Mark as snake body if part of the snake occupies the position
-                visionArray[i] = 1;
+                visionArray[i] = -3;
                 System.out.println("Detected Snake Body at: (" + visionX + "," + visionY + ")");
             } else {
-                // Remains as empty (2)
-                visionArray[i] = 2;
+                // Remains as empty
+                visionArray[i] = 5;
                 System.out.println("Detected Empty at: (" + visionX + "," + visionY + ")");
             }
         }
