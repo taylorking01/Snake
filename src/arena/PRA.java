@@ -1,6 +1,7 @@
 package arena;
 
 import controller.GameController;
+import controller.Timer;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -32,6 +33,7 @@ public class PRA implements GameListener {
     private int applesEaten;                        // Counter for apples eaten by the snake
     private Direction.Dir snakeDirection;           // Current direction of the snake
     private PRAPage praPage;                        // Reference to the PRAPage for UI updates
+    private Timer gameTimer; 						// Timer for the PRA training session
 
     /**
      * Constructs a PRA object.
@@ -52,8 +54,33 @@ public class PRA implements GameListener {
         this.isPaused = false;
         this.snakeDirection = Direction.Dir.RIGHT; // Initial direction
 
+     // Initialize the Timer for a 5-minute countdown (300 seconds)
+        this.gameTimer = new Timer(10, 0); // Count down from 300 to 0
+        this.gameTimer.addTimeUpdateListener(this::updateTimerLabel);
+        this.gameTimer.addTimerCompleteListener(this::onTimerComplete);
+        
         setupGameLoop();
         initializeGame();
+    }
+    
+    /**
+     * Updates the timer label in the PRAPage.
+     *
+     * @param formattedTime the formatted time string from the Timer
+     */
+    private void updateTimerLabel(String formattedTime) {
+        Platform.runLater(() -> praPage.updateTimerLabel(formattedTime));
+    }
+
+    /**
+     * Handles the timer completion event.
+     * Stops the game and respawns the snake.
+     */
+    private void onTimerComplete() {
+        Platform.runLater(() -> {
+            stopGame("Time's up! Training session ended.");
+            respawnSnake();
+        });
     }
 
     /**
@@ -96,11 +123,17 @@ public class PRA implements GameListener {
             System.out.println("Training is already running.");
             return;
         }
+        gameTimer.reset();               // Reset the timer for the new session
+        gameTimer.start();               // Start the timer
+        
+        gameController.resetSnake();         // Reset snake position and length without creating a new brain
 
         isRunning = true;
         isPaused = false;
         gameLoop.play();
+        
         praPage.updateTrainButton("Halt Training");
+        gameTimer.start(); // Start the timer
         System.out.println("Training started.");
     }
 
@@ -119,6 +152,7 @@ public class PRA implements GameListener {
 
         isPaused = true;
         gameLoop.pause();
+        gameTimer.stop(); // Pause the timer
         praPage.updateTrainButton("Resume Training");
         System.out.println("Training paused.");
     }
@@ -138,6 +172,7 @@ public class PRA implements GameListener {
 
         isPaused = false;
         gameLoop.play();
+        gameTimer.start(); // Resume the timer
         praPage.updateTrainButton("Halt Training");
         System.out.println("Training resumed.");
     }
@@ -229,6 +264,8 @@ public class PRA implements GameListener {
      */
     private void stopGame(String message) {
         gameLoop.stop();
+        gameTimer.stop(); // Stop the timer
+
         isRunning = false;
         isPaused = false;
         System.out.println(message);
@@ -255,6 +292,9 @@ public class PRA implements GameListener {
             applesEaten = 0;                      // Reset apple counter for the new round
             updateArenaDisplay();                 // Update display to reflect new positions
 
+            gameTimer.reset();
+            gameTimer.start();
+            
             if (!isPaused) {
                 gameLoop.play();                  // Resume the game loop if not paused
                 isRunning = true;
@@ -327,6 +367,7 @@ public class PRA implements GameListener {
         }
 
         gameLoop.stop();
+        gameTimer.stop(); // Stop the timer
         isRunning = false;
         isPaused = false;
         praPage.updateTrainButton("Train Agent");

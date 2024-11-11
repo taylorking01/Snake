@@ -103,7 +103,7 @@ public class PRAPage implements GameListener {
      * @return an HBox containing the Apple Counter
      */
     private HBox createTopBox() {
-        timerLabel = new Label("00:00");
+        timerLabel = new Label("05:00");
         timerLabel.setStyle("-fx-font-size: 16px; -fx-background-color: white; -fx-border-color: black; -fx-padding: 5px;");
         timerLabel.setMinWidth(60);
         timerLabel.setAlignment(Pos.CENTER);
@@ -136,6 +136,15 @@ public class PRAPage implements GameListener {
         button.setOnMouseExited(e -> button.setStyle(StyleConfig.getBaseButtonStyle()));
         button.setOnMousePressed(e -> button.setStyle(StyleConfig.getClickButtonStyle()));
         button.setOnMouseReleased(e -> button.setStyle(StyleConfig.getHoverButtonStyle()));
+    }
+    
+    /**
+     * Updates the timer label with the provided formatted time.
+     *
+     * @param formattedTime the formatted time string (e.g., "05:00")
+     */
+    public void updateTimerLabel(String formattedTime) {
+        Platform.runLater(() -> timerLabel.setText(formattedTime));
     }
 
     /**
