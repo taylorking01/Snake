@@ -54,8 +54,7 @@ public class PRA implements GameListener {
         this.isPaused = false;
         this.snakeDirection = Direction.Dir.RIGHT; // Initial direction
 
-     // Initialize the Timer for a 5-minute countdown (300 seconds)
-        this.gameTimer = new Timer(10, 0); // Count down from 300 to 0
+        this.gameTimer = new Timer(10, 0); // start time and end time,
         this.gameTimer.addTimeUpdateListener(this::updateTimerLabel);
         this.gameTimer.addTimerCompleteListener(this::onTimerComplete);
         
@@ -133,7 +132,6 @@ public class PRA implements GameListener {
         gameLoop.play();
         
         praPage.updateTrainButton("Halt Training");
-        gameTimer.start(); // Start the timer
         System.out.println("Training started.");
     }
 
@@ -290,6 +288,7 @@ public class PRA implements GameListener {
             gameController.resetSnake();         // Reset snake position and length without creating a new brain
             gameController.generateApple();       // Place a new apple
             applesEaten = 0;                      // Reset apple counter for the new round
+            praPage.updateAppleCounter(applesEaten); // Update the UI apple counter
             updateArenaDisplay();                 // Update display to reflect new positions
 
             gameTimer.reset();
