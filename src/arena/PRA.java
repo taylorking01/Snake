@@ -208,9 +208,6 @@ public class PRA implements GameListener {
         
         gameController.moveSnake();
 
-        
-        
-
         // Check for collisions
         if (checkCollision()) {
             stopGame("Snake collided! Respawning...");

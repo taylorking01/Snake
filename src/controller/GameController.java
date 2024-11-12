@@ -280,16 +280,48 @@ public class GameController {
      * Maps the neural network decision index to a Direction.Dir enum.
      */
     private Direction.Dir mapDecisionToDirection(int decisionIndex) {
-        switch (decisionIndex) {
-            case 0:
-                return Direction.Dir.UP;
-            case 1:
-                return Direction.Dir.LEFT;
-            case 2:
-                return Direction.Dir.RIGHT;
-            default:
-                return snake.getCurrentDirection(); // Default to current direction if index is unexpected
-        }
+    	
+    	Direction.Dir current = snake.getCurrentDirection();
+    	
+    	if (current == Direction.Dir.UP) {
+    		switch(decisionIndex) {
+				case 0: 
+					return Direction.Dir.LEFT;
+				case 1:
+					return Direction.Dir.UP;
+				case 2:
+					return Direction.Dir.RIGHT;
+    		}
+		} else if (current == Direction.Dir.RIGHT) {
+    		switch(decisionIndex) {
+				case 0: 
+					return Direction.Dir.UP;
+				case 1:
+					return Direction.Dir.RIGHT;
+				case 2:
+					return Direction.Dir.DOWN;
+    		}
+		} else if (current == Direction.Dir.DOWN) {
+    		switch(decisionIndex) {
+    			case 0: 
+    				return Direction.Dir.RIGHT;
+    			case 1:
+    				return Direction.Dir.DOWN;
+    			case 2:
+    				return Direction.Dir.LEFT;
+    		}
+    	} else if (current == Direction.Dir.LEFT) {
+    		switch(decisionIndex) {
+				case 0: 
+					return Direction.Dir.DOWN;
+				case 1:
+					return Direction.Dir.LEFT;
+				case 2:
+					return Direction.Dir.UP;
+    		}
+    	}
+		return current;
+    	
     }
 
     
