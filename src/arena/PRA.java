@@ -16,6 +16,8 @@ import snake.SnakeNode;
 import ui.GameListener;
 import ui.PRAPage;
 import apple.Apple;
+import ai.LossFunction;
+
 
 /**
  * The PRA class represents the Progressive Reinforcement Agent mode of the Snake game.
@@ -78,9 +80,17 @@ public class PRA implements GameListener {
     private void onTimerComplete() {
         Platform.runLater(() -> {
             stopGame("Time's up! Training session ended.");
+
+            // Calculate and log the loss
+            double targetApples = 5.0;
+            double actualApples = applesEaten;
+            double loss = LossFunction.meanSquaredError.apply(new double[]{targetApples}, new double[]{actualApples});
+            System.out.printf("Loss: %.3f%n", loss);
+
             respawnSnake();
         });
     }
+
 
     /**
      * Initializes the game by setting up the snake and apple.
@@ -265,9 +275,15 @@ public class PRA implements GameListener {
         isPaused = false;
         System.out.println(message);
 
+        // Calculate and log the loss
+        double targetApples = 5.0;
+        double actualApples = applesEaten;
+        double loss = LossFunction.meanSquaredError.apply(new double[]{targetApples}, new double[]{actualApples});
+        System.out.printf("Loss: %.3f%n", loss);
+
         // Notify the listener (PRAPage) about the game over
         Platform.runLater(() -> {
-            //praPage.showGameOverAlert(message);
+            // praPage.showGameOverAlert(message); // Uncomment if required for UI feedback
         });
 
         // Use PauseTransition for non-blocking delay before respawning
@@ -275,6 +291,7 @@ public class PRA implements GameListener {
         pause.setOnFinished(event -> respawnSnake());
         pause.play();
     }
+
 
     /**
      * Respawns the snake in the arena without creating a new instance.
