@@ -1,6 +1,14 @@
 package ai;
 
-public class LossFunctions {
+public class LossFunction {
+	
+	/**
+	 * Computes loss using MSE
+	 * @return 
+	 */
+	public static double meanSquaredError(int target, int actual) {
+		return Math.pow((target - actual), 2);
+	}
 
 	/**
 	 * Computes loss using cross entropy method

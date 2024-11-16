@@ -2,13 +2,17 @@ package ai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class NeuralNetwork {
     private List<Layer> layers;
+    //private Function<double[], double[]> lossFunction;
+
 
     // Constructor: Initializes the network architecture by adding layers
     public NeuralNetwork() {
         layers = new ArrayList<>();
+        //this.lossFunction = lossFunction;
     }
 
     // Adds a layer to the network
